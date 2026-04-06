@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %} {% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow-sm p-4" style="max-width: 450px; width: 100%; border-radius: 16px;">
+    <h4 class="text-center mb-3 fw-semibold text-primary">Create New User</h4>
+    <p class="text-center text-muted mb-4">Fill out the details below to create a new user account.</p>
+
+    <form method="POST" action="{{ url_for('register') }}">
+      {{ form.hidden_tag() if form else '' }}
+
+      <div class="mb-3">
+        <label for="name" class="form-label fw-medium">Full Name</label>
+        <input type="text" class="form-control form-control-lg" id="name" name="name" placeholder="John Doe" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label fw-medium">Email Address</label>
+        <input type="email" class="form-control form-control-lg" id="email" name="email" placeholder="you@example.com" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="Age" class="form-label fw-medium">Age</label>
+        <input type="number" class="form-control form-control-lg" id="Age" name="age" placeholder="e.g: 31" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-medium">State of Residence</label>
+        <select id="state" name="state" class="form-control form-control-lg" required>
+            <option value="">select state</option>
+            {% for state in states %}
+            <option value="{{ state['state'] }}">{{ state["state"] }}</option>
+            {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-medium">Local Government</label>
+        <select id="lga" name="lga" class="form-control form-control-lg" required>
+            <option value="">select LGA</option>
+        </select>
+      </div>
+
+
+      <div class="mb-3">
+        <label for="password" class="form-label fw-medium">Password</label>
+        <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Enter a password" required>
+      </div>
+
+      <div class="mb-4">
+        <label for="confirm_password" class="form-label fw-medium">Confirm Password</label>
+        <input type="password" class="form-control form-control-lg" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary btn-lg rounded-pill">Create User</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  input.form-control {
+    border-radius: 12px;
+    border: 2px solid #dee2e6;
+    transition: all 0.2s ease;
+  }
+
+  input.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 6px rgba(13, 110, 253, 0.3);
+  }
+
+  label {
+    color: #495057;
+  }
+
+  button.btn-primary {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+</style>
+
+<script>
+document.getElementById("state").addEventListener("change", function () {
+    const state = this.value;
+    const lgaSelect = document.getElementById("lga");
+
+    lgaSelect.innerHTML = "<option>Loading...</option>";
+
+    fetch(`/get-lgas?state=${state}`)
+        .then(response => response.json())
+        .then(data => {
+            lgaSelect.innerHTML = "<option value=''>Select LGA</option>";
+
+            data.forEach(lga => {
+                lgaSelect.innerHTML += `<option value="${lga}">${lga}</option>`;
+            });
+        })
+        .catch(() => {
+            lgaSelect.innerHTML = "<option>Error loading LGAs</option>";
+        });
+});
+</script>
+
+
+{% endblock %}
