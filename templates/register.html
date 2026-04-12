@@ -21,8 +21,8 @@
       </div>
 
       <div class="mb-3">
-        <label for="Age" class="form-label fw-medium">Age</label>
-        <input type="number" class="form-control form-control-lg" id="Age" name="age" placeholder="e.g: 31" required>
+        <label for="date" class="form-label fw-medium">Date of Birth</label>
+        <input type="date" id="date" name="date" class="form-control form-control-lg">
       </div>
 
       <div class="mb-3">
@@ -44,13 +44,23 @@
 
 
       <div class="mb-3">
-        <label for="password" class="form-label fw-medium">Password</label>
-        <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Enter a password" required>
+        <label for="password1" class="form-label fw-medium">Password</label>
+        <input type="password"  name="password1" class="form-control" id="password1" placeholder="Password" oninput="validatePassword()" onfocus="showValidation()" onblur="hideValidation()" required>
+
+        <div id="password-requirements" class="mb-3">
+            <ul class="mb-0" style="list-style: none; padding-left: 0;">
+                <li id="length">❌ At least 8 characters</li>
+                <li id="uppercase">❌ At least one uppercase letter</li>
+                <li id="number">❌ At least one number</li>
+                <li id="special">❌ At least one special character</li>
+            </ul>
+        </div>
       </div>
 
       <div class="mb-4">
-        <label for="confirm_password" class="form-label fw-medium">Confirm Password</label>
-        <input type="password" class="form-control form-control-lg" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+        <label for="password2" class="form-label fw-medium">Confirm Password</label>
+        <input type="password" name="password2" class="form-control" id="password2" placeholder="Confirm Password" oninput="checkMatch()" required>
+        <div id="match-message" class="form-text"></div>
       </div>
 
       <div class="d-grid">
@@ -103,6 +113,6 @@ document.getElementById("state").addEventListener("change", function () {
         });
 });
 </script>
-
+<script src="{{ url_for('static', filename='password-check.js') }}"></script>
 
 {% endblock %}

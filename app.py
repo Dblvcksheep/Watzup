@@ -3,11 +3,11 @@ from flask_bootstrap import Bootstrap5
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user,login_required
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text
+from sqlalchemy import Integer, String, Text,DateTime
 from functools import wraps
 from http import HTTPStatus
 import os
-from datetime import date
+from datetime import datetime, timedelta
 from flask_mail import Mail, Message
 import requests
 from flask_migrate import Migrate
@@ -51,6 +51,11 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(225), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
+    dob = db.Column(db.DateTime, nullable=False)
+    state = db.Column(db.String(100), nullable=False)
+    lga = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now())
 
 with app.app_context():
     db.create_all()
@@ -160,18 +165,23 @@ def register():
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email').lower()
-        age = request.form.get('age')
-        password = request.form.get('password')
-        confirm_pass = request.form.get('confirm_password')
+        date = request.form.get('date')
+        state = request.form.get('state')
+        lga = request.form.get('lga')
+        password = request.form.get('password1')
+        confirm_pass = request.form.get('password2')
+
         user = User.query.filter_by(email=email).first()
+        print(date)
+        dateformat = datetime.strptime(date, '%Y-%m-%d')
         if not user:
             if password == confirm_pass:
-                reg = User(name=name, age=age, email=email, password=generate_password_hash(password, salt_length=5))
+                reg = User(name=name, dob=dateformat, email=email, password=generate_password_hash(password, salt_length=5),state=state,lga=lga)
                 db.session.add(reg)
                 db.session.commit()
                 login_user(reg)
                 send_welcome_email(name, email, password)
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('index'))
             else:
                 flash('passwords do not match')
         else:
@@ -199,13 +209,13 @@ def login():
         if user:
             if check_password_hash(user.password, password):
                 login_user(user)
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('index'))
             else:
-                flash('wrong password')
+                flash('invalid credentials')
                 return redirect(url_for('login'))
 
         else:
-            flash('user not in the database')
+            flash('invalid credentials')
             return redirect(url_for('login'))
     return render_template('login.html')
 @app.errorhandler(TooManyRequests)

@@ -1,10 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
 
-</body>
-</html>
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%; border-radius: 16px;">
+    <h4 class="text-center mb-3 fw-semibold text-primary">Welcome Back</h4>
+    <p class="text-center text-muted mb-4">Log in to continue to your account</p>
+
+    <form method="POST" action="{{ url_for('login') }}">
+      {{ form.hidden_tag() if form else '' }}
+
+      <div class="mb-3">
+        <label for="email" class="form-label fw-medium">Email address</label>
+        <input type="email" class="form-control form-control-lg" id="email" name="email"
+               placeholder="you@example.com" required>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="form-label fw-medium">Password</label>
+        <input type="password" class="form-control form-control-lg" id="password" name="password"
+               placeholder="Enter your password" required>
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary btn-lg rounded-pill">Login</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .card {
+    border: none;
+  }
+
+  input.form-control {
+    border-radius: 12px;
+    border: 2px solid #dee2e6;
+    transition: all 0.2s ease;
+  }
+
+  input.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 6px rgba(13, 110, 253, 0.3);
+  }
+
+  label {
+    color: #495057;
+  }
+
+  button.btn-primary {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+</style>
+{% endblock %}
