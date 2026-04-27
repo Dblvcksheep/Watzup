@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="event-container">
+
+  <!-- Cover Image -->
+  <div class="event-cover">
+      <img src="{% if event.cover_img %}
+                {{ url_for('static', filename=event.cover_img) }}
+            {% else %}
+                {{ url_for('static', filename='images/default-avatar.jpg') }}
+            {% endif %}"
+      >
+  </div>
+
+  <!-- Event Info -->
+  <div class="event-details">
+
+    <h1>{{ event.title }}</h1>
+
+    <p class="event-meta">
+      📅 {{ event.event_date.strftime('%b %d, %Y • %I:%M %p') if event.event_date else "Date not set" }}
+    </p>
+
+    <p class="event-meta">
+      📍 {{ event.address }}, {{ event.lga }}, {{ event.state }}
+    </p>
+
+    <p class="event-meta">
+      👥 {{ event.attendee }} attendees
+    </p>
+
+    <p class="event-meta">
+      {% if event.event_type == "paid" %}
+        ₦{{ event.amount }}
+      {% endif %}
+    </p>
+
+    <p class="event-type">
+      {{ event.event_type }}
+    </p>
+
+    <hr>
+
+    <div class="event-description">
+      <h3>About this event</h3>
+      <p>{{ event.description }}</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="event-actions">
+        <!-- Reminder Button -->
+        <div class="event-actions">
+
+          <!-- Join Button -->
+          <button id="joinBtn" onclick="joinEvent('{{ event.id }}')">
+            🎉 Join Event
+          </button>
+
+          <!-- Reminder Button -->
+          <button id="reminderBtn" onclick="setReminder('{{ event.id }}')">
+            🔔 Set Reminder
+          </button>
+
+        </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+function setReminder(eventId) {
+    fetch(`/set-reminder/${eventId}`, {
+        method: "POST"
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Something went wrong");
+    });
+}
+function joinEvent(eventId) {
+    fetch(`/join-event/${eventId}`, {
+        method: "POST"
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+
+        // Optional: update UI
+        if (data.status === "joined") {
+            document.getElementById("joinBtn").innerText = "✅ Joined";
+            document.getElementById("joinBtn").disabled = true;
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Something went wrong");
+    });
+}
+</script>
+
+<style>
+.event-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.event-cover img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.event-details h1 {
+    margin-top: 15px;
+}
+
+.event-meta {
+    color: #555;
+    margin: 5px 0;
+}
+
+.event-description {
+    margin-top: 20px;
+}
+
+.event-actions {
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    background: black;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+</style>
+
+{% endblock %}

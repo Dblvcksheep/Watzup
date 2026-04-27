@@ -3,13 +3,15 @@ from flask_bootstrap import Bootstrap5
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user,login_required
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text,DateTime
+from sqlalchemy import Integer, String, Text,DateTime,Date,Time
 from functools import wraps
 from http import HTTPStatus
 import os
 from datetime import datetime, timedelta
 from flask_mail import Mail, Message
 import requests
+from uuid import uuid4
+from werkzeug.utils import secure_filename
 from flask_migrate import Migrate
 import base64
 import random
@@ -55,7 +57,61 @@ class User(db.Model, UserMixin):
     state = db.Column(db.String(100), nullable=False)
     lga = db.Column(db.String(100), nullable=False)
     password = db.Column(db.Text, nullable=False)
+    wallet = db.Column(db.Float, nullable=False, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.now())
+    event = db.relationship('Event', backref='user', lazy='dynamic', cascade="all, delete-orphan")
+    attendee = db.relationship('Attendee', backref='user', lazy='dynamic', cascade="all, delete-orphan")
+    private_attendee = db.relationship('PrivateAttendee', backref='user', lazy='dynamic', cascade="all, delete-orphan")
+
+class Event(db.Model):
+    __tablename__ = "event"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200))
+    description = db.Column(db.Text, nullable=False)
+    address = db.Column(db.String(200))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    state = db.Column(db.String(100), nullable=False)
+    lga = db.Column(db.String(100), nullable=False)
+    likes = db.Column(db.Integer, default = 0)
+    event_type= db.Column(db.String(200), default='free')#can be free, paid, private
+    amount = db.Column(db.Integer, default=0)
+    event_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
+    attendee =db.Column(db.Integer, default=100)
+    cover_img = db.Column(db.Text, nullable=False)
+    attender = db.relationship('Attendee', backref='event', lazy='dynamic', cascade="all, delete-orphan")
+    private = db.relationship('PrivateAttendee', backref='event', lazy='dynamic', cascade="all, delete-orphan")
+    images = db.relationship('EventImage', backref='event', lazy='dynamic', cascade="all, delete-orphan")
+    created_at = db.Column(db.DateTime, default=datetime.now())
+
+
+class EventImage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    image_url = db.Column(db.Text, nullable=False)
+    image_id = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.now())
+
+class Attendee(db.Model):
+    __tablename__ = "attendee"
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now())
+
+class PrivateAttendee(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now())
+
+class SetReminder(db.Model):
+    __tablename__ = "setreminder"
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now())
+
 
 with app.app_context():
     db.create_all()
@@ -158,7 +214,12 @@ with open('nigeria.json', 'r') as f:
 
 @app.route('/')
 def index():
-    return render_template('home.html')
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    events = Event.query.order_by(Event.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    if current_user.is_authenticated:
+        events = Event.query.filter(Event.state == current_user.state, Event.lga == current_user.lga).order_by(Event.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    return render_template('home.html', events=events)
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -187,6 +248,129 @@ def register():
         else:
             flash('User already exist', 'error')
     return render_template('register.html', states=states)
+
+
+@app.route('/create_event', methods=["GET", "POST"])
+@login_required
+def create_event():
+    if request.method == "POST":
+        title = request.form.get("title")
+        description = request.form.get("description")
+        address = request.form.get("address")
+        state = request.form.get("state")
+        lga = request.form.get("lga")
+        event_type = request.form.get("event_type")
+        date = request.form.get('date')  # "2026-04-20"
+        time = request.form.get('time')  # "14:30"
+        end_time = request.form.get('endtime')
+        attendee = request.form.get("attendee")
+        amount = request.form.get("amount")
+        cover = request.files.get("cover")
+        event_datetime = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+
+        end_datetime = datetime.strptime(f"{date} {end_time}", "%Y-%m-%d %H:%M")
+
+        cover_filename = None
+        if cover and cover.filename:
+            cover_upload_path = os.path.join(current_app.root_path, 'static/cover')
+            os.makedirs(cover_upload_path, exist_ok=True)
+            # Use unique filename to avoid collisions
+            cover_filename = f"{uuid4().hex}_{secure_filename(cover.filename)}"
+            cover.save(os.path.join(cover_upload_path, cover_filename))
+
+        new_event = Event(title=title,
+                          description=description,
+                          address=address,
+                          state=state,
+                          lga=lga,
+                          user_id=current_user.id,
+                          attendee = attendee,
+                          cover_img =f"cover/{cover_filename}",
+                          event_type=event_type,
+                          amount = amount if amount else 0,
+                          event_date=event_datetime,
+                          end_date = end_datetime)
+
+        db.session.add(new_event)
+        db.session.commit()
+
+        return redirect(url_for('index'))
+    return render_template("create_event.html",states=states)
+
+
+@app.route('/join-event/<int:event_id>', methods=['POST'])
+@login_required
+def join_event(event_id):
+
+    joined = Attendee.query.filter_by(event_id=event_id, user_id = current_user.id).first()
+    if joined:
+        return jsonify({"message": "You are already registered for this event", "status": "error"}), 409
+    # Example logic (you’ll expand this)
+
+    event = Event.query.get(event_id)
+
+    if not event:
+        return jsonify({"message": "Event not found", "status": "error"}), 404
+
+    if event.event_type == "paid":
+        if event.amount > current_user.wallet:
+            return jsonify({"message": "Your balance is too low", "status": "error"}), 409
+        current_user.wallet -= event.amount
+
+    elif event.event_type == "private":
+        private_attend = PrivateAttendee(
+            event_id=event_id,
+            user_id=current_user.id
+        )
+        db.session.add(private_attend)
+        db.session.commit()
+        return jsonify({
+            "message": "If you are selected you will be added to the list",
+            "status": "joined"
+        })
+
+    # Increment attendees
+
+    attend = Attendee(
+        event_id=event_id,
+        user_id = current_user.id
+    )
+    db.session.add(attend)
+    db.session.commit()
+
+    return jsonify({
+        "message": "You have joined this event 🎉",
+        "status": "joined"
+    })
+
+@app.route('/set-reminder/<int:event_id>', methods=['POST'])
+def set_reminder(event_id):
+
+    already_set = SetReminder.query.filter_by(event_id=event_id, user_id = current_user.id).first()
+    if already_set:
+        return jsonify({"message": "You are already set reminder for this event", "status": "error"}), 409
+
+
+    reminder = SetReminder(
+        event_id=event_id,
+        user_id = current_user.id
+    )
+    db.session.add(reminder)
+    db.session.commit()
+    # For now: simple logic (you’ll expand later)
+
+    # Example: store in DB or session later
+    return jsonify({
+        "message": "Reminder set successfully 🔔"
+    })
+
+@app.route('/event_detail/<int:event_id>')
+@login_required
+def event_detail(event_id):
+    event = Event.query.get(event_id)
+
+    return render_template("event_detail.html", event=event)
+
 
 @app.route("/get-lgas")
 def get_lgas():

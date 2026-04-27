@@ -1,6 +1,146 @@
 {% extends "base.html" %}
-{% block title %}Watzup — Know watzup around you{% endblock %}
+{% block title %}Explore Events{% endblock %}
+
 {% block content %}
 
+<header class="container-fluid py-5 bg-gradient position-relative" style="background: linear-gradient(135deg, #f0f4ff 0%, #e2e8f0 100%);">
+    <!-- Optional decorative shapes -->
+<!--    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('/static/images/hero-bg-shapes.svg') no-repeat center/cover; opacity: 0.1;"></div>-->
+
+    <div class="row justify-content-center align-items-center g-5 py-5 position-relative" style="z-index: 1;">
+        <div class="col-lg-8 text-center">
+            <!-- Main Heading -->
+            <h1 class="display-3 fw-bold text-dark lh-sm mb-4" style="font-family: 'Inter', sans-serif;">
+                Home of <span class="text-primary position-relative" style="font-weight: 900;">
+                    Events
+                    <span class="position-absolute start-0 bottom-0 w-100" style="height:4px; background: linear-gradient(90deg,#4f46e5,#3b82f6); border-radius:2px; animation: shimmer 2s infinite;"></span>
+                </span>
+            </h1>
+
+            <!-- Subheading -->
+            <p class="lead text-secondary mx-auto mb-4" style="max-width: 600px; font-size: 1.2rem;">
+                From event creation to attendee management and ticket sales, streamline your entire event experience on one platform.
+            </p>
+
+            <!-- Call to Action Buttons -->
+            <div class="d-flex gap-3 justify-content-center mt-4 flex-wrap">
+                {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('register') }}" class="btn btn-dark btn-lg px-5 py-3 shadow-lg text-white" style="transition: transform 0.3s, box-shadow 0.3s;">
+                        Get Started
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-dark btn-lg px-5 py-3 shadow-lg" style="transition: transform 0.3s, box-shadow 0.3s;">
+                        Sign In
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="fw-bold">Explore Events</h3>
+
+  {% if current_user.is_authenticated %}
+  <a href="{{ url_for('create_event') }}" class="btn btn-primary">
+    + Create Event
+  </a>
+  {% endif %}
+</div>
+
+<!-- Events Grid -->
+<div class="row g-4">
+
+  {% for event in events.items %}
+  <div class="col-md-6 col-lg-4 col-xl-3">
+
+    <a href="{{ url_for('event_detail', event_id=event.id) }}" class="text-decoration-none text-dark">
+      <div class="card shadow-sm h-100 event-card">
+
+
+        <!-- Event Image -->
+        <div class="event-img-wrapper">
+          <img src="{% if event.cover_img %}
+                        {{ url_for('static', filename=event.cover_img) }}
+                    {% else %}
+                        {{ url_for('static', filename='images/default-avatar.jpg') }}
+                    {% endif %}"
+               class="card-img-top"
+               alt="Event Image"
+               style="aspect-ratio: 16/9; object-fit: cover;">
+        </div>
+
+        <!-- Event Info -->
+        <div class="card-body">
+          <h6 class="fw-bold mb-2">
+            {{ event.title }}
+          </h6>
+
+          <p class="text-muted small mb-1">
+            {{ event.state or "Unknown location" }}
+          </p>
+
+          <p class="text-muted small mb-0">
+            {{ event.event_date.strftime('%b %d, %Y • %I:%M %p') if event.event_date else "" }}
+          </p>
+        </div>
+
+      </div>
+    </a>
+
+  </div>
+
+  {% else %}
+    <div class="col-12 text-center mt-5">
+      <h5 class="text-muted">No events in your region</h5>
+      <p class="text-muted">Be the first to create one 🚀</p>
+    </div>
+  {% endfor %}
+
+</div>
+
+<!-- Pagination -->
+{% if events.pages > 1 %}
+<nav class="mt-5">
+  <ul class="pagination justify-content-center">
+
+    <!-- Previous -->
+    <li class="page-item {% if not events.has_prev %}disabled{% endif %}">
+      <a class="page-link" href="{{ url_for('index', page=events.prev_num) if events.has_prev else '#' }}">
+        Previous
+      </a>
+    </li>
+
+    <!-- Page Numbers -->
+    {% for page_num in events.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+      {% if page_num %}
+        <li class="page-item {% if page_num == events.page %}active{% endif %}">
+          <a class="page-link" href="{{ url_for('index', page=page_num) }}">
+            {{ page_num }}
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">...</span></li>
+      {% endif %}
+    {% endfor %}
+
+    <!-- Next -->
+    <li class="page-item {% if not events.has_next %}disabled{% endif %}">
+      <a class="page-link" href="{{ url_for('index', page=events.next_num) if events.has_next else '#' }}">
+        Next
+      </a>
+    </li>
+
+  </ul>
+</nav>
+{% endif %}
+<br>
+
+<style>
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        50% { transform: translateX(0); }
+        100% { transform: translateX(100%); }
+    }
+</style>
 
 {% endblock %}

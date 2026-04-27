@@ -47,14 +47,14 @@
         <!-- Left side (only when logged in) -->
         {% if current_user.is_authenticated %}
         <ul class="navbar-nav me-auto">
+<!--          <li class="nav-item">-->
+<!--            <a class="nav-link text-dark" href="#">Connections</a>-->
+<!--          </li>-->
           <li class="nav-item">
-            <a class="nav-link text-dark" href="#">Connections</a>
+            <a class="nav-link text-dark" href="#">Requests</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-dark" href="#">Add Ads</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-dark" href="#">Become an Agent</a>
+            <a class="nav-link text-dark" href="#">My Events</a>
           </li>
           <li class="nav-item">
             <a class="nav-link text-dark" href="#">About</a>
@@ -68,6 +68,11 @@
             <li class="nav-item">
               <a class="nav-link text-dark" href="#">
                 Profile
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-dark" href="#">
+                ₦ {{ current_user.wallet }}
               </a>
             </li>
             <li class="nav-item">
