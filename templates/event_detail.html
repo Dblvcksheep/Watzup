@@ -1,145 +1,249 @@
 {% extends "base.html" %}
+{% block title %}Event Detail{% endblock %}
 
 {% block content %}
-<div class="event-container">
+<div class="event-page">
 
-  <!-- Cover Image -->
+  <!-- Cover -->
   <div class="event-cover">
-      <img src="{% if event.cover_img %}
-                {{ url_for('static', filename=event.cover_img) }}
-            {% else %}
-                {{ url_for('static', filename='images/default-avatar.jpg') }}
-            {% endif %}"
-      >
+    <img src="{% if event.cover_img %}
+        {{ url_for('static', filename=event.cover_img) }}
+      {% else %}
+        {{ url_for('static', filename='images/default-avatar.jpg') }}
+      {% endif %}">
   </div>
 
-  <!-- Event Info -->
-  <div class="event-details">
+  <div class="event-body">
 
-    <h1>{{ event.title }}</h1>
+    <!-- Main Info -->
+    <div class="event-main">
+      <h1 class="event-title">{{ event.title }}</h1>
 
-    <p class="event-meta">
-      📅 {{ event.event_date.strftime('%b %d, %Y • %I:%M %p') if event.event_date else "Date not set" }}
-    </p>
+      <div class="event-meta">
+        <span>📅 {{ event.event_date.strftime('%b %d, %Y • %I:%M %p') if event.event_date else "Date not set" }}</span>
+        <span>📍{% if joined or current_user.id == event.user_id %} {{ event.address }},{% endif %} {{ event.lga }}, {{ event.state }}</span>
+        <span>👥 {{ attendee_count }}/{{ event.attendee }} attending</span>
 
-    <p class="event-meta">
-      📍 {{ event.address }}, {{ event.lga }}, {{ event.state }}
-    </p>
+        {% if event.event_type == "paid" %}
+          <span class="price">₦{{ event.amount }}</span>
+        {% endif %}
+      </div>
 
-    <p class="event-meta">
-      👥 {{ event.attendee }} attendees
-    </p>
+      <div class="event-type-badge">
+        {{ event.event_type }}
+      </div>
+    </div>
 
-    <p class="event-meta">
-      {% if event.event_type == "paid" %}
-        ₦{{ event.amount }}
+    <!-- Actions -->
+    {% if current_user.id != event.user_id %}
+    <div class="event-actions">
+
+      {% if not joined %}
+      <button class="btn primary" id="joinBtn" onclick="joinEvent('{{ event.id }}')">
+        Join Event
+      </button>
+      {% else %}
+      <button class="btn success" disabled>
+        Joined
+      </button>
       {% endif %}
-    </p>
 
-    <p class="event-type">
-      {{ event.event_type }}
-    </p>
+      {% if not already_set %}
+      <form action="{{ url_for('set_reminder', event_id=event.id) }}" method="POST">
+        <button class="btn secondary" type="submit">Set Reminder</button>
+      </form>
+      {% endif %}
 
-    <hr>
+    </div>
+    {% endif %}
 
-    <div class="event-description">
+    <!-- Description -->
+    <div class="card">
       <h3>About this event</h3>
       <p>{{ event.description }}</p>
     </div>
 
-    <!-- Actions -->
-    <div class="event-actions">
-        <!-- Reminder Button -->
-        <div class="event-actions">
+    <!-- Owner View -->
+    {% if current_user.id == event.user_id %}
+    <div class="card">
+      <h3>Attendees</h3>
 
-          <!-- Join Button -->
-          <button id="joinBtn" onclick="joinEvent('{{ event.id }}')">
-            🎉 Join Event
-          </button>
+      {% if attendee %}
+        {% for attendee in attendee %}
+          <div class="list-item">
+            <a href="{{ url_for('profile', user_id=attendee.user.id) }}">{{ attendee.user.name }}</a>
 
-          <!-- Reminder Button -->
-          <button id="reminderBtn" onclick="setReminder('{{ event.id }}')">
-            🔔 Set Reminder
-          </button>
-
-        </div>
-
+            {% if event.event_type != "paid" %}
+            <a class="action danger" href="{{ url_for('manage_attendee',table='attendee',action=0,event_id=event.id,user_id=attendee.user.id) }}">Remove</a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">No attendees yet</p>
+      {% endif %}
     </div>
+    {% endif %}
+
+    <!-- Private Requests -->
+    {% if event.event_type == "private" and current_user.id == event.user_id %}
+    <div class="card">
+      <h3>Requests</h3>
+
+      {% if private %}
+        {% for request in private %}
+        <div class="list-item">
+          <a href="{{ url_for('profile', user_id=request.user.id) }}">{{ request.user.name }}</a>
+
+          <div class="actions-inline">
+            <a class="action success" href="{{ url_for('manage_attendee',table='private',action=1,event_id=event.id,user_id=request.user.id) }}">Approve</a>
+            <a class="action danger" href="{{ url_for('manage_attendee',table='private',action=0,event_id=event.id,user_id=request.user.id) }}">Reject</a>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">No requests</p>
+      {% endif %}
+    </div>
+    {% endif %}
 
   </div>
 </div>
 
 <script>
-function setReminder(eventId) {
-    fetch(`/set-reminder/${eventId}`, {
-        method: "POST"
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Something went wrong");
-    });
-}
 function joinEvent(eventId) {
     fetch(`/join-event/${eventId}`, {
         method: "POST"
     })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
+    .then(async res => {
+        const data = await res.json();
 
-        // Optional: update UI
-        if (data.status === "joined") {
-            document.getElementById("joinBtn").innerText = "✅ Joined";
-            document.getElementById("joinBtn").disabled = true;
+        if (!res.ok) {
+            alert(data.message);
+            return;
         }
+
+        document.getElementById("joinBtn").innerText = "Joined";
+        document.getElementById("joinBtn").classList.remove("primary");
+        document.getElementById("joinBtn").classList.add("success");
+        document.getElementById("joinBtn").disabled = true;
     })
-    .catch(err => {
-        console.error(err);
-        alert("Something went wrong");
-    });
+    .catch(() => alert("Something went wrong"));
 }
 </script>
 
 <style>
-.event-container {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
+.event-page {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
 .event-cover img {
     width: 100%;
-    border-radius: 10px;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 12px;
 }
 
-.event-details h1 {
-    margin-top: 15px;
+.event-body {
+    margin-top: 20px;
+}
+
+.event-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 10px;
 }
 
 .event-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     color: #555;
-    margin: 5px 0;
+    font-size: 14px;
 }
 
-.event-description {
-    margin-top: 20px;
+.price {
+    font-weight: 600;
+    color: #111;
+}
+
+.event-type-badge {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    font-size: 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    text-transform: capitalize;
 }
 
 .event-actions {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.btn {
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn.primary {
+    background: #111;
+    color: #fff;
+}
+
+.btn.secondary {
+    background: #f4f4f4;
+}
+
+.btn.success {
+    background: #e6f4ea;
+    color: #1e7e34;
+}
+
+.card {
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 16px;
     margin-top: 20px;
 }
 
-button {
-    padding: 10px 15px;
-    border: none;
-    background: black;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
+.card h3 {
+    margin-bottom: 10px;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.actions-inline {
+    display: flex;
+    gap: 10px;
+}
+
+.action {
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.action.success {
+    color: #1e7e34;
+}
+
+.action.danger {
+    color: #c0392b;
+}
+
+.muted {
+    color: #888;
 }
 </style>
 

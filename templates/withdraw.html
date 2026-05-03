@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Withdraw{% endblock %}
+
+{% block content %}
+
+<section style="max-width: 620px; margin: auto;">
+
+  <h2 class="section-title">Withdraw Funds</h2>
+  <p class="section-desc">
+    Make sure the name you provide matches your bank account name.
+  </p>
+
+  <form method="POST" class="card">
+
+    <!-- Full Name -->
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text"
+             name="name"
+             placeholder="John Doe"
+             required>
+    </div>
+
+    <!-- Account Number -->
+    <div class="form-group">
+      <label>Account Number</label>
+      <input type="text"
+             name="acct_number"
+             placeholder="0123456789"
+             required>
+    </div>
+
+    <!-- Bank -->
+    <div class="form-group">
+      <label>Select Bank</label>
+      <select name="bank" id="bank" class="input" required>
+          <option value="">Select bank</option>
+          <option value="opay">Opay</option>
+          <option value="kuda">Kuda</option>
+          <option value="palmpay">Palmpay</option>
+          <option value="moniepoint">Moniepoint</option>
+      </select>
+    </div>
+
+    <!-- Amount -->
+    <div class="form-group">
+      <label>Amount</label>
+      <input type="number"
+             name="amount"
+             placeholder="Enter amount"
+             min="1"
+             required>
+      <small>Ensure you have ₦50 charges, balance: ₦{{ current_user.wallet }}</small>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button type="submit">Withdraw</button>
+      <a href="{{ url_for('index') }}">Cancel</a>
+    </div>
+
+  </form>
+</section>
+
+<style>
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 22px;
+  }
+
+  .input {
+    width: 100%;
+    margin-top: 6px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #020617;
+    color: var(--text);
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent-soft);
+  }
+
+  .form-group small {
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+
+  .actions button {
+    padding: 14px 28px;
+    border-radius: 999px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .actions button:hover {
+    opacity: 0.9;
+  }
+
+  .actions a {
+    padding: 14px 28px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .actions a:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  @media (max-width: 600px) {
+    section {
+      padding: 0 8px;
+    }
+  }
+</style>
+
+{% endblock %}

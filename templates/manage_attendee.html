@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Manage Attendee{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+
+  <div class="auth-card shadow-soft rounded-soft">
+
+    <h2 class="auth-title">Verify Access</h2>
+    <p class="auth-subtitle">
+      Enter your password to manage attendees.
+    </p>
+
+    <form method="POST">
+
+      <div class="form-group">
+        <label>Verification Code</label>
+        <input
+          type="password"
+          name="code"
+          placeholder="Enter your password"
+          required
+        >
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-primary-custom">
+          Continue
+        </button>
+
+        <a href="{{ url_for('index') }}" class="btn-light-custom">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<style>
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    padding: 28px;
+    border: 1px solid #eee;
+}
+
+.auth-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Form */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+.form-group input {
+    padding: 12px 14px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* Actions */
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.actions a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+/* Mobile */
+@media (max-width: 500px) {
+    .auth-card {
+        padding: 20px;
+    }
+}
+</style>
+
+{% endblock %}

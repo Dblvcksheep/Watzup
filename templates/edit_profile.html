@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}{{ user.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow-sm p-4" style="max-width: 450px; width: 100%; border-radius: 16px;">
+    <h4 class="text-center mb-3 fw-semibold text-primary">Edit User</h4>
+    <p class="text-center text-muted mb-4">Make edits to what you need to change.</p>
+
+    <!-- ✅ IMPORTANT: enctype added -->
+    <form method="POST" action="{{ url_for('edit_profile', user_id=user.id) }}" enctype="multipart/form-data">
+      {{ form.hidden_tag() if form else '' }}
+
+      {% if current_user.id == user.id %}
+
+      <div class="mb-3">
+          <label class="form-label">Profile Image</label>
+          <input type="file" name="profile" class="form-control" accept="image/*">
+          <small class="text-muted">Leave blank if you don't want to change your profile image.</small>
+      </div>
+
+      <div class="mb-3">
+        <label for="name" class="form-label fw-medium">Full Name</label>
+        <input type="text" value="{{ user.name }}" class="form-control form-control-lg" id="name" name="name" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label fw-medium">Email Address</label>
+        <input type="email" value="{{ user.email }}" class="form-control form-control-lg" id="email" name="email" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="date" class="form-label fw-medium">Date of Birth</label>
+        <input type="date" id="date" value="{{ user.date_of_birth }}" name="date" class="form-control form-control-lg">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-medium">Gender</label>
+        <select name="gender" class="form-control form-control-lg" required>
+            <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
+            <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-medium">State of Residence</label>
+        <select id="state" name="state" class="form-control form-control-lg" required>
+            <option value="">Select state</option>
+            {% for s in states %}
+              <option value="{{ s['state'] }}" {% if user.state == s['state'] %}selected{% endif %}>
+                {{ s["state"] }}
+              </option>
+            {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-medium">Local Government</label>
+        <select id="lga" name="lga" class="form-control form-control-lg" required>
+            <option value="{{ user.lga }}">{{ user.lga or "Select LGA" }}</option>
+        </select>
+      </div>
+
+      {% endif %}
+
+      {% if current_user.id == 1 %}
+      <div class="mb-3">
+        <label class="form-label fw-medium">Is Admin</label>
+        <select name="admin" class="form-control form-control-lg">
+          <option value="true" {% if user.is_admin %}selected{% endif %}>True</option>
+          <option value="false" {% if not user.is_admin %}selected{% endif %}>False</option>
+        </select>
+      </div>
+      {% endif %}
+
+      {% if current_user.is_admin or current_user.id == 1 %}
+      <div class="mb-3">
+          <label class="form-label fw-medium">Wallet Balance</label>
+          <input type="number" value="{{ user.wallet }}" name="wallet" class="form-control form-control-lg">
+      </div>
+      {% endif %}
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary btn-lg rounded-pill">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+input.form-control, select.form-control {
+  border-radius: 12px;
+  border: 2px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+input.form-control:focus, select.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 6px rgba(13, 110, 253, 0.3);
+}
+
+label {
+  color: #495057;
+}
+
+button.btn-primary {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const stateEl = document.getElementById("state");
+    const lgaEl = document.getElementById("lga");
+
+    if (!stateEl) return;
+
+    stateEl.addEventListener("change", function () {
+        const state = this.value;
+
+        lgaEl.innerHTML = "<option>Loading...</option>";
+
+        fetch(`/get-lgas?state=${state}`)
+            .then(res => res.json())
+            .then(data => {
+                lgaEl.innerHTML = "<option value=''>Select LGA</option>";
+
+                data.forEach(lga => {
+                    lgaEl.innerHTML += `<option value="${lga}">${lga}</option>`;
+                });
+            })
+            .catch(() => {
+                lgaEl.innerHTML = "<option>Error loading LGAs</option>";
+            });
+    });
+});
+</script>
+
+{% endblock %}

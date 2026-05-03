@@ -3,124 +3,213 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Base template{% endblock %}</title>
+  <title>{% block title %}Watzup{% endblock %}</title>
 
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Font (clean, modern) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 
 <style>
-    footer {
-      background: #0d6efd;
-      color: white;
-      text-align: center;
-      padding: 1rem 0;
-      font-size: 0.9rem;
-    }
+/* ===== Global ===== */
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f8f9fb;
+  color: #1a1a1a;
+}
 
-    footer a {
-      color: #ffc107;
-      text-decoration: none;
-    }
+/* ===== Navbar ===== */
+.navbar {
+  background: #ffffff;
+  border-bottom: 1px solid #eee;
+}
 
-    footer a:hover {
-      text-decoration: underline;
-    }
+.navbar-brand {
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.3px;
+}
+
+.nav-link {
+  font-size: 14px;
+  color: #444 !important;
+}
+
+.nav-link:hover {
+  color: #000 !important;
+}
+
+/* ===== Primary Button Style ===== */
+.btn-primary-custom {
+  background: #2563eb;
+  border: none;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.btn-primary-custom:hover {
+  background: #1e4ed8;
+}
+
+/* ===== Secondary Button ===== */
+.btn-light-custom {
+  background: #f1f3f5;
+  border: none;
+  color: #333;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.btn-light-custom:hover {
+  background: #e2e6ea;
+}
+
+/* ===== Flash Messages ===== */
+.alert {
+  font-size: 14px;
+}
+
+/* ===== Main Layout ===== */
+main.container {
+  max-width: 1100px;
+}
+
+/* ===== Footer ===== */
+footer {
+  background: #ffffff;
+  border-top: 1px solid #eee;
+  color: #777;
+  text-align: center;
+  padding: 1.2rem 0;
+  font-size: 13px;
+}
+
+/* ===== Utility ===== */
+.shadow-soft {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+
+.rounded-soft {
+  border-radius: 10px;
+}
 </style>
+
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-    <div class="container">
-      <a class="navbar-brand fw-bold text-dark" href="{{ url_for('index') }}">
-        Watzup
-      </a>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-              data-bs-target="#navbarNav" aria-controls="navbarNav"
-              aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      Watzup
+    </a>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <!-- Left side (only when logged in) -->
-        {% if current_user.is_authenticated %}
-        <ul class="navbar-nav me-auto">
-<!--          <li class="nav-item">-->
-<!--            <a class="nav-link text-dark" href="#">Connections</a>-->
-<!--          </li>-->
-          <li class="nav-item">
-            <a class="nav-link text-dark" href="#">Requests</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-dark" href="#">My Events</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-dark" href="#">About</a>
-          </li>
-        </ul>
+    <div class="collapse navbar-collapse" id="navbarNav">
+
+      {% if current_user.is_authenticated %}
+      <ul class="navbar-nav me-auto">
+
+        {% if current_user.is_admin or current_user.id == 1 %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('users') }}">Users</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('events') }}">Events</a>
+        </li>
         {% endif %}
 
-        <!-- Right side -->
-        <ul class="navbar-nav ms-auto">
-          {% if current_user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link text-dark" href="#">
-                Profile
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-dark" href="#">
-                ₦ {{ current_user.wallet }}
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="btn btn-light text-primary ms-lg-2" href="{{ url_for('logout') }}">
-                Logout
-              </a>
-            </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="nav-link text-dark" href="{{ url_for('login') }}">Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="btn btn-light text-primary ms-lg-2" href="{{ url_for('register') }}">
-                Register
-              </a>
-            </li>
-          {% endif %}
-        </ul>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('my_event') }}">My Events</a>
+        </li>
 
-      </div>
+        <li class="nav-item">
+          <a class="nav-link" href="#">About Us</a>
+        </li>
+
+      </ul>
+      {% endif %}
+
+      <!-- Right Side -->
+      <ul class="navbar-nav ms-auto align-items-center">
+
+        {% if current_user.is_authenticated %}
+
+        <li class="nav-item me-2">
+          <a class="nav-link" href="{{ url_for('profile', user_id=current_user.id) }}">Profile</a>
+        </li>
+
+        {% if current_user.bank and current_user.bank.acct_number %}
+        <li class="nav-item me-2">
+          <a class="nav-link" href="{{ url_for('wallet') }}">₦ {{ current_user.wallet }}</a>
+        </li>
+        {% else %}
+        <li class="nav-item me-2">
+          <a class="nav-link" href="{{ url_for('generate_bank') }}">₦ {{ current_user.wallet }}</a>
+        </li>
+
+        {% endif %}
+
+
+        <li class="nav-item">
+          <a class="btn btn-light-custom" href="{{ url_for('logout') }}">
+            Logout
+          </a>
+        </li>
+
+        {% else %}
+
+        <li class="nav-item me-2">
+          <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="btn btn-primary-custom" href="{{ url_for('register') }}">
+            Get Started
+          </a>
+        </li>
+
+        {% endif %}
+      </ul>
+
     </div>
-  </nav>
+  </div>
+</nav>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="container mt-3">
-        {% for category, message in messages %}
-          <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' or category == 'danger' else category }} alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
-  <!-- Page Content -->
-  <main class="container min-vh-100 mt-4">
-    {% block content %}
-    {% endblock %}
-  </main>
-
-  <footer>
-    <div class="container">
-      <p class="mb-0">&copy; {{ current_year if current_year else 2026 }} Watzup. All rights reserved.</p>
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show shadow-soft rounded-soft">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
     </div>
-  </footer>
+  {% endif %}
+{% endwith %}
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Content -->
+<main class="container min-vh-100 mt-4">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    &copy; {{ current_year if current_year else 2026 }} Watzup. Built for events.
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

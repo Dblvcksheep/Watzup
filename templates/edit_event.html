@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% block title %}Edit Event{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    <div class="card shadow-sm border-0 p-4">
+      <h4 class="fw-bold mb-4">Edit Event</h4>
+
+      <form method="POST"
+            action="{{ url_for('edit_event', event_id=event.id) }}"
+            enctype="multipart/form-data">
+
+        <!-- Title -->
+        <div class="mb-3">
+          <label class="form-label">Event Title</label>
+          <input type="text"
+                 value="{{ event.title }}"
+                 name="title"
+                 class="form-control"
+                 required>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea name="description"
+                    rows="4"
+                    class="form-control"
+                    required>{{ event.description }}</textarea>
+        </div>
+
+        <!-- Address -->
+        <div class="mb-3">
+          <label class="form-label">Address</label>
+          <input type="text"
+                 value="{{ event.address }}"
+                 name="address"
+                 class="form-control">
+        </div>
+
+        <!-- State -->
+        <div class="mb-3">
+          <label class="form-label fw-medium">State of Residence</label>
+          <select id="state" name="state" class="form-control" required>
+            <option value="">Select state</option>
+            {% for s in states %}
+              <option value="{{ s['state'] }}"
+                {% if event.state == s['state'] %}selected{% endif %}>
+                {{ s["state"] }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- LGA -->
+        <div class="mb-3">
+          <label class="form-label fw-medium">Local Government</label>
+          <select id="lga" name="lga" class="form-control" required>
+            <option value="{{ event.lga }}">
+              {{ event.lga or "Select LGA" }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Event Type -->
+        <div class="mb-3">
+          <label class="form-label">Event Type</label>
+          <select name="event_type" class="form-select" required>
+            <option value="free" {% if event.event_type == 'free' %}selected{% endif %}>Free</option>
+            <option value="paid" {% if event.event_type == 'paid' %}selected{% endif %}>Paid</option>
+            <option value="private" {% if event.event_type == 'private' %}selected{% endif %}>Private</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Category</label>
+          <select name="category" class="form-select" required>
+            <option value="party" {% if event.category == 'party' %}selected{% endif %}>Party</option>
+            <option value="hangout" {% if event.category == 'hangout' %}selected{% endif %}>Hangout</option>
+            <option value="business and networking" {% if event.category == 'business and networking' %}selected{% endif %}>Business & Networking</option>
+            <option value="tech innovation" {% if event.category == 'tech innovation' %}selected{% endif %}>Tech & Innovation</option>
+            <option value="education and training" {% if event.category == 'education and training' %}selected{% endif %}>Education & Training</option>
+            <option value="entertainment and shows" {% if event.category == 'entertainment and shows' %}selected{% endif %}>Entertainment & Shows</option>
+            <option value="sports and fitness" {% if event.category == 'sports and fitness' %}selected{% endif %}>Sports & Fitness</option>
+            <option value="religious and spiritual" {% if event.category == 'religious and spiritual' %}selected{% endif %}>Religious & Spiritual</option>
+            <option value="weddings/birthdays" {% if event.category == 'weddings/birthdays' %}selected{% endif %}>weddings/birthdays</option>
+            <option value="community and social impact" {% if event.category == 'community and social impact' %}selected{% endif %}>Community & Social Impact</option>
+            <option value="others" {% if event.category == 'others' %}selected{% endif %}>Others</option>
+          </select>
+        </div>
+
+        <!-- Amount -->
+        <div class="mb-3">
+          <label class="form-label">Amount</label>
+          <input type="number"
+                 value="{{ event.amount or '' }}"
+                 name="amount"
+                 class="form-control">
+          <small class="text-muted">Leave blank if it's a free event.</small>
+        </div>
+
+        <!-- Max attendees -->
+        <div class="mb-3">
+          <label class="form-label">Max attendees</label>
+          <input type="number"
+                 value="{{ event.attendee }}"
+                 name="attendee"
+                 class="form-control"
+                 required>
+        </div>
+
+        <!-- Date -->
+        <div class="mb-3">
+          <label class="form-label">Event Date</label>
+          <input type="date"
+                 value="{{ date }}"
+                 name="date"
+                 class="form-control">
+        </div>
+
+        <!-- Time -->
+        <div class="mb-3">
+          <label class="form-label">Event Time</label>
+          <input type="time"
+                 value="{{ start_time }}"
+                 name="time"
+                 class="form-control"
+                 required>
+        </div>
+
+        <!-- End Time -->
+        <div class="mb-3">
+          <label class="form-label">End Time</label>
+          <input type="time"
+                 value="{{ end_time }}"
+                 name="endtime"
+                 class="form-control"
+                 required>
+        </div>
+
+        <!-- Cover Image -->
+        <div class="mb-4">
+          <label class="form-label">Cover Image</label>
+          <input type="file"
+                 name="cover"
+                 class="form-control"
+                 accept="image/*">
+          <small class="text-muted">Leave blank if you don’t want to change it.</small>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-primary px-4">
+            Save
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const stateEl = document.getElementById("state");
+    const lgaEl = document.getElementById("lga");
+
+    if (!stateEl) return;
+
+    stateEl.addEventListener("change", function () {
+        const state = this.value;
+
+        lgaEl.innerHTML = "<option>Loading...</option>";
+
+        fetch(`/get-lgas?state=${state}`)
+            .then(res => res.json())
+            .then(data => {
+                lgaEl.innerHTML = "<option value=''>Select LGA</option>";
+
+                data.forEach(lga => {
+                    lgaEl.innerHTML += `<option value="${lga}">${lga}</option>`;
+                });
+            })
+            .catch(() => {
+                lgaEl.innerHTML = "<option>Error loading LGAs</option>";
+            });
+    });
+});
+</script>
+
+{% endblock %}
