@@ -1,250 +1,426 @@
 {% extends "base.html" %}
-{% block title %}Event Detail{% endblock %}
+{% block title %}Event Details | Watzup{% endblock %}
 
 {% block content %}
-<div class="event-page">
 
-  <!-- Cover -->
-  <div class="event-cover">
-    <img src="{% if event.cover_img %}
-        {{ url_for('static', filename=event.cover_img) }}
-      {% else %}
-        {{ url_for('static', filename='images/default-avatar.jpg') }}
-      {% endif %}">
-  </div>
+<!-- =========================
+ HERO COVER
+========================= -->
 
-  <div class="event-body">
+<div class="event-hero">
 
-    <!-- Main Info -->
-    <div class="event-main">
-      <h1 class="event-title">{{ event.title }}</h1>
+  <img src="{% if event.cover_img %}
+      {{ url_for('static', filename=event.cover_img) }}
+    {% else %}
+      https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=2070&auto=format&fit=crop
+    {% endif %}"
+    class="event-hero-img">
 
-      <div class="event-meta">
-        <span>📅 {{ event.event_date.strftime('%b %d, %Y • %I:%M %p') if event.event_date else "Date not set" }}</span>
-        <span>📍{% if joined or current_user.id == event.user_id %} {{ event.address }},{% endif %} {{ event.lga }}, {{ event.state }}</span>
-        <span>👥 {{ attendee_count }}/{{ event.attendee }} attending</span>
+  <div class="event-hero-overlay"></div>
 
-        {% if event.event_type == "paid" %}
-          <span class="price">₦{{ event.amount }}</span>
+  <div class="event-hero-content container">
+
+    <div class="event-tag">
+      {{ event.event_type }}
+    </div>
+
+    <h1 class="event-title">
+      {{ event.title }}
+    </h1>
+
+    <div class="event-meta">
+
+      <span>📅
+        {{ event.event_date.strftime('%b %d, %Y • %I:%M %p')
+        if event.event_date else "Date not set" }}
+      </span>
+
+      <span>📍
+        {% if joined or current_user.id == event.user_id %}
+          {{ event.address }},
         {% endif %}
-      </div>
+        {{ event.lga }}, {{ event.state }}
+      </span>
 
-      <div class="event-type-badge">
-        {{ event.event_type }}
-      </div>
-    </div>
+      <span>👥 {{ attendee_count }}/{{ event.attendee }} attending</span>
 
-    <!-- Actions -->
-    {% if current_user.id != event.user_id %}
-    <div class="event-actions">
-
-      {% if not joined %}
-      <button class="btn primary" id="joinBtn" onclick="joinEvent('{{ event.id }}')">
-        Join Event
-      </button>
-      {% else %}
-      <button class="btn success" disabled>
-        Joined
-      </button>
-      {% endif %}
-
-      {% if not already_set %}
-      <form action="{{ url_for('set_reminder', event_id=event.id) }}" method="POST">
-        <button class="btn secondary" type="submit">Set Reminder</button>
-      </form>
+      {% if event.event_type == "paid" %}
+      <span class="price">₦{{ event.platform_amount }}</span>
       {% endif %}
 
     </div>
-    {% endif %}
-
-    <!-- Description -->
-    <div class="card">
-      <h3>About this event</h3>
-      <p>{{ event.description }}</p>
-    </div>
-
-    <!-- Owner View -->
-    {% if current_user.id == event.user_id %}
-    <div class="card">
-      <h3>Attendees</h3>
-
-      {% if attendee %}
-        {% for attendee in attendee %}
-          <div class="list-item">
-            <a href="{{ url_for('profile', user_id=attendee.user.id) }}">{{ attendee.user.name }}</a>
-
-            {% if event.event_type != "paid" %}
-            <a class="action danger" href="{{ url_for('manage_attendee',table='attendee',action=0,event_id=event.id,user_id=attendee.user.id) }}">Remove</a>
-            {% endif %}
-          </div>
-        {% endfor %}
-      {% else %}
-        <p class="muted">No attendees yet</p>
-      {% endif %}
-    </div>
-    {% endif %}
-
-    <!-- Private Requests -->
-    {% if event.event_type == "private" and current_user.id == event.user_id %}
-    <div class="card">
-      <h3>Requests</h3>
-
-      {% if private %}
-        {% for request in private %}
-        <div class="list-item">
-          <a href="{{ url_for('profile', user_id=request.user.id) }}">{{ request.user.name }}</a>
-
-          <div class="actions-inline">
-            <a class="action success" href="{{ url_for('manage_attendee',table='private',action=1,event_id=event.id,user_id=request.user.id) }}">Approve</a>
-            <a class="action danger" href="{{ url_for('manage_attendee',table='private',action=0,event_id=event.id,user_id=request.user.id) }}">Reject</a>
-          </div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <p class="muted">No requests</p>
-      {% endif %}
-    </div>
-    {% endif %}
 
   </div>
+
 </div>
 
+<!-- =========================
+ ACTIONS
+========================= -->
+
+<div class="container">
+
+  {% if current_user.id != event.user_id %}
+
+  <div class="action-bar glass-card">
+
+    {% if not joined %}
+
+    <button class="btn btn-primary-custom"
+            id="joinBtn"
+            onclick="joinEvent('{{ event.id }}')">
+
+      Join Event
+
+    </button>
+
+    {% else %}
+
+    <button class="btn btn-joined" disabled>
+      Joined ✓
+    </button>
+
+    {% endif %}
+
+    {% if not already_set %}
+
+    <form action="{{ url_for('set_reminder', event_id=event.id) }}"
+          method="POST">
+
+      <button class="btn btn-light-custom">
+        Set Reminder
+      </button>
+
+    </form>
+
+    {% endif %}
+
+  </div>
+
+  {% endif %}
+
+</div>
+
+<!-- =========================
+ ABOUT EVENT
+========================= -->
+
+<div class="container mt-4">
+
+  <div class="glass-card p-4">
+
+    <h3 class="section-title">About this Event</h3>
+
+    <p class="text-secondary">
+      {{ event.description }}
+    </p>
+
+  </div>
+
+</div>
+
+<!-- =========================
+ ATTENDEES (OWNER VIEW)
+========================= -->
+
+{% if current_user.id == event.user_id %}
+
+<div class="container mt-4">
+
+  <div class="glass-card p-4">
+
+    <h3 class="section-title">Attendees</h3>
+
+    {% if attendee %}
+
+      {% for attendee in attendee %}
+
+      <div class="list-item">
+
+        <a href="{{ url_for('profile',
+        user_id=attendee.user.id) }}"
+           class="attendee-name">
+
+          👤 {{ attendee.user.name }}
+
+        </a>
+
+        {% if event.event_type != "paid" %}
+
+        <a class="danger-link"
+        href="{{ url_for('manage_attendee',
+        table='attendee',
+        action=0,
+        event_id=event.id,
+        user_id=attendee.user.id) }}">
+
+          Remove
+
+        </a>
+
+        {% endif %}
+
+      </div>
+
+      {% endfor %}
+
+    {% else %}
+
+      <p class="text-secondary">
+        No attendees yet
+      </p>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+{% endif %}
+
+<!-- =========================
+ PRIVATE REQUESTS
+========================= -->
+
+{% if event.event_type == "private"
+and current_user.id == event.user_id %}
+
+<div class="container mt-4">
+
+  <div class="glass-card p-4">
+
+    <h3 class="section-title">Join Requests</h3>
+
+    {% if private %}
+
+      {% for request in private %}
+
+      <div class="list-item">
+
+        <a href="{{ url_for('profile',
+        user_id=request.user.id) }}"
+           class="attendee-name">
+
+          👤 {{ request.user.name }}
+
+        </a>
+
+        <div class="actions">
+
+          <a class="success-link"
+          href="{{ url_for('manage_attendee',
+          table='private',
+          action=1,
+          event_id=event.id,
+          user_id=request.user.id) }}">
+
+            Approve
+
+          </a>
+
+          <a class="danger-link"
+          href="{{ url_for('manage_attendee',
+          table='private',
+          action=0,
+          event_id=event.id,
+          user_id=request.user.id) }}">
+
+            Reject
+
+          </a>
+
+        </div>
+
+      </div>
+
+      {% endfor %}
+
+    {% else %}
+
+      <p class="text-secondary">
+        No requests yet
+      </p>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+{% endif %}
+
+<!-- =========================
+ JOIN SCRIPT
+========================= -->
+
 <script>
-function joinEvent(eventId) {
-    fetch(`/join-event/${eventId}`, {
-        method: "POST"
-    })
-    .then(async res => {
-        const data = await res.json();
 
-        if (!res.ok) {
-            alert(data.message);
-            return;
-        }
+function joinEvent(eventId){
 
-        document.getElementById("joinBtn").innerText = "Joined";
-        document.getElementById("joinBtn").classList.remove("primary");
-        document.getElementById("joinBtn").classList.add("success");
-        document.getElementById("joinBtn").disabled = true;
-    })
-    .catch(() => alert("Something went wrong"));
+  fetch(`/join-event/${eventId}`,{
+    method:"POST"
+  })
+
+  .then(async res => {
+
+    const data = await res.json();
+
+    if(!res.ok){
+      alert(data.message);
+      return;
+    }
+
+    const btn = document.getElementById("joinBtn");
+
+    btn.innerText = "Joined ✓";
+    btn.classList.add("btn-joined");
+    btn.disabled = true;
+
+  })
+
+  .catch(() => alert("Something went wrong"));
+
 }
+
 </script>
 
+<!-- =========================
+ STYLES
+========================= -->
+
 <style>
-.event-page {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
+
+/* HERO */
+.event-hero{
+  position:relative;
+  height:420px;
+  overflow:hidden;
+  border-radius:0 0 30px 30px;
 }
 
-.event-cover img {
-    width: 100%;
-    height: 320px;
-    object-fit: cover;
-    border-radius: 12px;
+.event-hero-img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
 
-.event-body {
-    margin-top: 20px;
+.event-hero-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(15,15,26,0.95),
+    rgba(15,15,26,0.3)
+  );
 }
 
-.event-title {
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 10px;
+.event-hero-content{
+  position:absolute;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  color:white;
 }
 
-.event-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    color: #555;
-    font-size: 14px;
+.event-tag{
+  display:inline-block;
+  padding:8px 14px;
+  border-radius:30px;
+  background:rgba(123,47,247,0.2);
+  border:1px solid rgba(123,47,247,0.4);
+  font-size:12px;
 }
 
-.price {
-    font-weight: 600;
-    color: #111;
+.event-title{
+  font-size:42px;
+  font-weight:800;
+  margin-top:10px;
 }
 
-.event-type-badge {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 5px 10px;
-    font-size: 12px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    text-transform: capitalize;
+.event-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+  margin-top:10px;
+  color:#cfcfcf;
+  font-size:14px;
 }
 
-.event-actions {
-    display: flex;
-    gap: 10px;
-    margin: 20px 0;
+.price{
+  background:linear-gradient(90deg,#7B2FF7,#00C6FF);
+  padding:6px 12px;
+  border-radius:12px;
+  color:white;
 }
 
-.btn {
-    padding: 10px 16px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
+/* ACTION BAR */
+.action-bar{
+  display:flex;
+  gap:15px;
+  padding:20px;
+  margin-top:-20px;
+  justify-content:center;
 }
 
-.btn.primary {
-    background: #111;
-    color: #fff;
+/* BUTTON STATES */
+.btn-joined{
+  background:rgba(0,198,255,0.15);
+  border:1px solid #00C6FF;
+  color:#00C6FF;
+  padding:10px 18px;
+  border-radius:12px;
 }
 
-.btn.secondary {
-    background: #f4f4f4;
+/* GLASS */
+.glass-card{
+  background:#1A1A2E;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:18px;
 }
 
-.btn.success {
-    background: #e6f4ea;
-    color: #1e7e34;
+/* LIST */
+.list-item{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
 }
 
-.card {
-    border: 1px solid #eee;
-    border-radius: 10px;
-    padding: 16px;
-    margin-top: 20px;
+.attendee-name{
+  color:white;
+  text-decoration:none;
 }
 
-.card h3 {
-    margin-bottom: 10px;
+.danger-link{
+  color:#ff5a7a;
+  text-decoration:none;
 }
 
-.list-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #f0f0f0;
+.success-link{
+  color:#34d399;
+  text-decoration:none;
 }
 
-.actions-inline {
-    display: flex;
-    gap: 10px;
+.section-title{
+  color:white;
+  font-weight:700;
+  margin-bottom:15px;
 }
 
-.action {
-    font-size: 13px;
-    text-decoration: none;
+/* MOBILE */
+@media(max-width:768px){
+
+  .event-title{
+    font-size:28px;
+  }
+
+  .action-bar{
+    flex-direction:column;
+  }
+
 }
 
-.action.success {
-    color: #1e7e34;
-}
-
-.action.danger {
-    color: #c0392b;
-}
-
-.muted {
-    color: #888;
-}
 </style>
 
 {% endblock %}
+

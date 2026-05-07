@@ -1,126 +1,330 @@
 {% extends 'base.html' %}
-{% block title %} {% endblock %}
+{% block title %}Create Account | Watzup{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-  <div class="card shadow-sm p-4" style="max-width: 450px; width: 100%; border-radius: 16px;">
-    <h4 class="text-center mb-3 fw-semibold text-primary">Create New User</h4>
-    <p class="text-center text-muted mb-4">Fill out the details below to create a new user account.</p>
 
-    <form method="POST" action="{{ url_for('register') }}">
-      {{ form.hidden_tag() if form else '' }}
+<!-- =========================
+ REGISTER WRAPPER
+========================= -->
 
-      <div class="mb-3">
-        <label for="name" class="form-label fw-medium">Full Name</label>
-        <input type="text" class="form-control form-control-lg" id="name" name="name" placeholder="John Doe" required>
-      </div>
+<div class="register-wrapper">
 
-      <div class="mb-3">
-        <label for="email" class="form-label fw-medium">Email Address</label>
-        <input type="email" class="form-control form-control-lg" id="email" name="email" placeholder="you@example.com" required>
-      </div>
+  <div class="container">
 
-      <div class="mb-3">
-        <label for="date" class="form-label fw-medium">Date of Birth</label>
-        <input type="date" id="date" name="date" class="form-control form-control-lg">
-      </div>
+    <div class="row align-items-center min-vh-80">
 
-      <div class="mb-3">
-        <label class="form-label fw-medium">Gender</label>
-        <select  name="gender" class="form-control form-control-lg" required>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-        </select>
-      </div>
+      <!-- LEFT VISUAL PANEL -->
+      <div class="col-lg-6 d-none d-lg-block">
 
-      <div class="mb-3">
-        <label class="form-label fw-medium">State of Residence</label>
-        <select id="state" name="state" class="form-control form-control-lg" required>
-            <option value="">select state</option>
-            {% for state in states %}
-            <option value="{{ state['state'] }}">{{ state["state"] }}</option>
-            {% endfor %}
-        </select>
-      </div>
+        <div class="register-visual">
 
-      <div class="mb-3">
-        <label class="form-label fw-medium">Local Government</label>
-        <select id="lga" name="lga" class="form-control form-control-lg" required>
-            <option value="">select LGA</option>
-        </select>
-      </div>
+          <img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=2070&auto=format&fit=crop"
+               class="register-img">
 
+          <div class="register-overlay"></div>
 
-      <div class="mb-3">
-        <label for="password1" class="form-label fw-medium">Password</label>
-        <input type="password"  name="password1" class="form-control" id="password1" placeholder="Password" oninput="validatePassword()" onfocus="showValidation()" onblur="hideValidation()" required>
+          <div class="register-text">
 
-        <div id="password-requirements" class="mb-3">
-            <ul class="mb-0" style="list-style: none; padding-left: 0;">
-                <li id="length">❌ At least 8 characters</li>
-                <li id="uppercase">❌ At least one uppercase letter</li>
-                <li id="number">❌ At least one number</li>
-                <li id="special">❌ At least one special character</li>
-            </ul>
+            <h2>
+              Join the <span>Watzup</span> Experience
+            </h2>
+
+            <p>
+              Discover events, connect with people,
+              and never miss a moment again.
+            </p>
+
+          </div>
+
         </div>
+
       </div>
 
-      <div class="mb-4">
-        <label for="password2" class="form-label fw-medium">Confirm Password</label>
-        <input type="password" name="password2" class="form-control" id="password2" placeholder="Confirm Password" oninput="checkMatch()" required>
-        <div id="match-message" class="form-text"></div>
+      <!-- RIGHT FORM PANEL -->
+      <div class="col-lg-6">
+
+        <div class="glass-card p-4 p-md-5 register-card">
+
+          <h3 class="fw-bold text-white mb-2">
+            Create Account
+          </h3>
+
+          <p class="text-secondary mb-4">
+            Start your journey into events and experiences 🎟️
+          </p>
+
+          <form method="POST" action="{{ url_for('register') }}">
+
+            {{ form.hidden_tag() if form else '' }}
+
+            <!-- NAME -->
+            <div class="mb-3">
+
+              <label class="form-label text-light">Full Name</label>
+
+              <input type="text"
+                     name="name"
+                     class="form-control input-dark"
+                     placeholder="John Doe"
+                     required>
+
+            </div>
+
+            <!-- EMAIL -->
+            <div class="mb-3">
+
+              <label class="form-label text-light">Email</label>
+
+              <input type="email"
+                     name="email"
+                     class="form-control input-dark"
+                     placeholder="you@example.com"
+                     required>
+
+            </div>
+
+            <!-- DOB -->
+            <div class="mb-3">
+
+              <label class="form-label text-light">Date of Birth</label>
+
+              <input type="date"
+                     name="date"
+                     class="form-control input-dark">
+
+            </div>
+
+            <!-- GENDER -->
+            <div class="mb-3">
+
+              <label class="form-label text-light">Gender</label>
+
+              <select name="gender"
+                      class="form-control input-dark"
+                      required>
+
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+
+              </select>
+
+            </div>
+
+            <!-- STATE -->
+            <div class="mb-3">
+
+              <label class="form-label text-light">State</label>
+
+              <select id="state"
+                      name="state"
+                      class="form-control input-dark"
+                      required>
+
+                <option value="">Select state</option>
+
+                {% for state in states %}
+                <option value="{{ state['state'] }}">
+                  {{ state["state"] }}
+                </option>
+                {% endfor %}
+
+              </select>
+
+            </div>
+
+            <!-- LGA -->
+            <div class="mb-3">
+
+              <label class="form-label text-light">Local Government</label>
+
+              <select id="lga"
+                      name="lga"
+                      class="form-control input-dark"
+                      required>
+
+                <option value="">Select LGA</option>
+
+              </select>
+
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="mb-3">
+
+              <label class="form-label text-light">Password</label>
+
+              <input type="password"
+                     name="password1"
+                     id="password1"
+                     class="form-control input-dark"
+                     placeholder="Password"
+                     oninput="validatePassword()"
+                     required>
+
+            </div>
+
+            <!-- CONFIRM -->
+            <div class="mb-4">
+
+              <label class="form-label text-light">
+                Confirm Password
+              </label>
+
+              <input type="password"
+                     name="password2"
+                     id="password2"
+                     class="form-control input-dark"
+                     placeholder="Confirm Password"
+                     oninput="checkMatch()"
+                     required>
+
+              <div id="match-message"
+                   class="small text-secondary mt-1">
+              </div>
+
+            </div>
+
+            <!-- SUBMIT -->
+            <button type="submit"
+                    class="btn btn-primary-custom w-100">
+
+              Create Account
+
+            </button>
+
+          </form>
+
+        </div>
+
       </div>
 
-      <div class="d-grid">
-        <button type="submit" class="btn btn-primary btn-lg rounded-pill">Create User</button>
-      </div>
-    </form>
+    </div>
+
   </div>
+
 </div>
 
+<!-- =========================
+ STYLES
+========================= -->
+
 <style>
-  input.form-control {
-    border-radius: 12px;
-    border: 2px solid #dee2e6;
-    transition: all 0.2s ease;
+
+/* WRAPPER */
+.register-wrapper{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+}
+
+/* VISUAL SIDE */
+.register-visual{
+  position:relative;
+  height:650px;
+  border-radius:25px;
+  overflow:hidden;
+}
+
+.register-img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.register-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(15,15,26,0.95),
+    rgba(15,15,26,0.3)
+  );
+}
+
+.register-text{
+  position:absolute;
+  bottom:30px;
+  left:30px;
+  color:white;
+}
+
+.register-text h2{
+  font-size:36px;
+  font-weight:800;
+}
+
+.register-text span{
+  background:linear-gradient(90deg,#7B2FF7,#00C6FF);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* FORM */
+.register-card{
+  border-radius:24px;
+}
+
+/* INPUTS */
+.input-dark{
+  background:#111827 !important;
+  border:1px solid rgba(255,255,255,0.08);
+  color:white !important;
+  border-radius:14px;
+  padding:12px;
+}
+
+.input-dark:focus{
+  border-color:#7B2FF7;
+  box-shadow:0 0 10px rgba(123,47,247,0.25);
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .register-wrapper{
+    padding:40px 0;
   }
 
-  input.form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 6px rgba(13, 110, 253, 0.3);
-  }
+}
 
-  label {
-    color: #495057;
-  }
-
-  button.btn-primary {
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
 </style>
 
+<!-- =========================
+ AJAX LGA
+========================= -->
+
 <script>
+
 document.getElementById("state").addEventListener("change", function () {
+
     const state = this.value;
     const lgaSelect = document.getElementById("lga");
 
     lgaSelect.innerHTML = "<option>Loading...</option>";
 
     fetch(`/get-lgas?state=${state}`)
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-            lgaSelect.innerHTML = "<option value=''>Select LGA</option>";
+
+            lgaSelect.innerHTML = "<option>Select LGA</option>";
 
             data.forEach(lga => {
-                lgaSelect.innerHTML += `<option value="${lga}">${lga}</option>`;
+                lgaSelect.innerHTML +=
+                `<option value="${lga}">${lga}</option>`;
             });
+
         })
         .catch(() => {
-            lgaSelect.innerHTML = "<option>Error loading LGAs</option>";
+            lgaSelect.innerHTML =
+            "<option>Error loading LGAs</option>";
         });
+
 });
+
 </script>
+
 <script src="{{ url_for('static', filename='password-check.js') }}"></script>
 
 {% endblock %}
+

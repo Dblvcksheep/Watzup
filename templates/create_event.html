@@ -1,154 +1,349 @@
 {% extends "base.html" %}
-{% block title %}Create Event{% endblock %}
+{% block title %}Create Event | Watzup{% endblock %}
 
 {% block content %}
 
-<div class="row justify-content-center">
-  <div class="col-lg-8">
+<!-- =========================
+ HERO HEADER
+========================= -->
 
-    <div class="card shadow-sm border-0 p-4">
-      <h4 class="fw-bold mb-4">Create New Event</h4>
+<div class="create-hero">
 
-      <form method="POST" action="{{ url_for('create_event') }}" enctype="multipart/form-data">
+  <div class="container">
 
-        <!-- Title -->
-        <div class="mb-3">
-          <label class="form-label">Event Title</label>
-          <input type="text" name="title" class="form-control" placeholder="e.g. Tech Meetup 2026" required>
-        </div>
+    <h1>
+      Create an <span>Experience</span>
+    </h1>
 
-        <!-- Description -->
-        <div class="mb-3">
-          <label class="form-label">Description</label>
-          <textarea name="description" rows="4" class="form-control"
-                    placeholder="Describe your event..." required></textarea>
-        </div>
-
-        <!-- Address -->
-        <div class="mb-3">
-          <label class="form-label">Address</label>
-          <input type="text" name="address" class="form-control"
-                 placeholder="Street, area, landmark">
-        </div>
-
-          <div class="mb-3">
-            <label class="form-label">State</label>
-            <select id="state" name="state" class="form-control" required>
-                <option value="">select state</option>
-                {% for state in states %}
-                <option value="{{ state['state'] }}">{{ state["state"] }}</option>
-                {% endfor %}
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Local Government</label>
-            <select id="lga" name="lga" class="form-control" required>
-                <option value="">select LGA</option>
-            </select>
-          </div>
-
-        <!-- Event Type -->
-        <div class="mb-3">
-          <label class="form-label">Event Type</label>
-          <select name="event_type" class="form-select" required>
-            <option value="free">Free</option>
-            <option value="paid">Paid</option>
-            <option value="private">Private</option>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Category</label>
-          <select name="category" class="form-select" required>
-            <option value="party">Party</option>
-            <option value="hangout">Hangout</option>
-            <option value="business and networking">Business & Networking</option>
-            <option value="tech innovation">Tech & Innovation</option>
-            <option value="education and training">Education & Training</option>
-            <option value="entertainment and shows">Entertainment & Shows</option>
-            <option value="sports and fitness">Sports & Fitness</option>
-            <option value="religious and spiritual">Religious & Spiritual</option>
-            <option value="weddings/birthdays">weddings/birthdays</option>
-            <option value="community and social impact">Community & Social Impact</option>
-            <option value="others">Others</option>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Amount</label>
-          <input type="number" name="amount" class="form-control" placeholder="e.g. 2000">
-          <small class="text-muted">Leave blank if it isn't a paid event!!</small>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Max attendees</label>
-          <input type="number" name="attendee" class="form-control" placeholder="e.g. 50" required>
-        </div>
-
-        <div class="mb-3">
-        <label for="date" class="form-label">Event Date</label>
-        <input type="date" id="date" name="date" class="form-control">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Event Time</label>
-          <input type="time" name="time" class="form-control" required>
-          <small class="text-muted">This is a 24hour clock</small>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">End Time</label>
-          <input type="time" name="endtime" class="form-control" required>
-          <small class="text-muted">This is a 24hour clock</small>
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label">Cover Image</label>
-          <input type="file" name="cover" class="form-control" accept="image/*" required>
-          <small class="text-muted">This is your seller!!</small>
-        </div>
-
-<!--        &lt;!&ndash; Multiple Images &ndash;&gt;-->
-<!--        <div class="mb-4">-->
-<!--          <label class="form-label">Images</label>-->
-<!--          <input type="file" name="images" class="form-control" accept="image/*" multiple>-->
-<!--          <small class="text-muted">You can upload multiple images</small>-->
-<!--        </div>-->
-
-        <!-- Submit -->
-        <div class="d-flex justify-content-end">
-          <button type="submit" class="btn btn-primary px-4">
-            Create Event
-          </button>
-        </div>
-
-      </form>
-    </div>
+    <p>
+      Turn your idea into a real event people can discover, join, and enjoy.
+    </p>
 
   </div>
+
 </div>
+
+<!-- =========================
+ FORM WRAPPER
+========================= -->
+
+<div class="container create-wrapper">
+
+  <form method="POST"
+        action="{{ url_for('create_event') }}"
+        enctype="multipart/form-data">
+
+    <!-- ================= BASIC INFO ================= -->
+
+    <div class="glass-card section">
+
+      <h3>Basic Details</h3>
+
+      <input type="text"
+             name="title"
+             class="input-dark"
+             placeholder="Event title (e.g. Tech Meetup 2026)"
+             required>
+
+      <textarea name="description"
+                class="input-dark"
+                rows="4"
+                placeholder="Describe your event..."
+                required></textarea>
+
+    </div>
+
+    <!-- ================= LOCATION ================= -->
+
+    <div class="glass-card section">
+
+      <h3>Location</h3>
+
+      <input type="text"
+             name="address"
+             class="input-dark"
+             placeholder="Street / Landmark">
+
+      <select id="state"
+              name="state"
+              class="input-dark"
+              required>
+
+        <option value="">Select State</option>
+
+        {% for state in states %}
+        <option value="{{ state['state'] }}">
+          {{ state["state"] }}
+        </option>
+        {% endfor %}
+
+      </select>
+
+      <select id="lga"
+              name="lga"
+              class="input-dark"
+              required>
+
+        <option value="">Select LGA</option>
+
+      </select>
+
+    </div>
+
+    <!-- ================= EVENT TYPE ================= -->
+
+    <div class="glass-card section">
+
+      <h3>Event Type</h3>
+
+      <select name="event_type"
+              class="input-dark"
+              required>
+
+        <option value="free">Free</option>
+        <option value="paid">Paid</option>
+        <option value="private">Private</option>
+
+      </select>
+
+      <select name="category"
+              class="input-dark"
+              required>
+
+        <option value="party">Party</option>
+        <option value="hangout">Hangout</option>
+        <option value="business and networking">Business & Networking</option>
+        <option value="tech innovation">Tech & Innovation</option>
+        <option value="education and training">Education & Training</option>
+        <option value="entertainment and shows">Entertainment & Shows</option>
+        <option value="sports and fitness">Sports & Fitness</option>
+        <option value="religious and spiritual">Religious & Spiritual</option>
+        <option value="weddings/birthdays">Weddings/Birthdays</option>
+        <option value="community and social impact">Community & Social Impact</option>
+        <option value="others">Others</option>
+
+      </select>
+
+    </div>
+
+    <!-- ================= TIMING ================= -->
+
+    <div class="glass-card section">
+
+      <h3>Schedule</h3>
+
+      <input type="date"
+             name="date"
+             class="input-dark">
+
+      <input type="time"
+             name="time"
+             class="input-dark">
+
+      <input type="time"
+             name="endtime"
+             class="input-dark">
+
+    </div>
+
+    <!-- ================= PRICING ================= -->
+
+    <div class="glass-card section">
+
+      <h3>Pricing & Capacity</h3>
+
+      <input type="number"
+             name="amount"
+             class="input-dark"
+             id="amount"
+             placeholder="Ticket price (optional)">
+      <small id="platform-amount"></small>
+
+      <input type="number"
+             name="attendee"
+             class="input-dark"
+             placeholder="Max attendees"
+             required>
+
+      <small class="hint">
+        Leave price empty for free events
+      </small>
+
+    </div>
+
+    <!-- ================= MEDIA ================= -->
+
+    <div class="glass-card section">
+
+      <h3>Media</h3>
+
+      <input type="file"
+             name="cover"
+             class="input-dark"
+             accept="image/*"
+             required>
+
+      <small class="hint">
+        This is your event cover image — first impression matters
+      </small>
+
+    </div>
+
+    <!-- ================= SUBMIT ================= -->
+
+    <div class="submit-area">
+
+      <button type="submit"
+              class="btn btn-primary-custom">
+
+        Publish Event 🚀
+
+      </button>
+
+    </div>
+
+  </form>
+
+</div>
+
+<!-- =========================
+ STYLES
+========================= -->
+
+<style>
+
+/* HERO */
+.create-hero{
+  padding:60px 0 30px;
+  text-align:center;
+}
+
+.create-hero h1{
+  font-size:42px;
+  font-weight:900;
+  color:white;
+}
+
+.create-hero span{
+  background:linear-gradient(90deg,#7B2FF7,#00C6FF);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.create-hero p{
+  color:#aaa;
+}
+
+/* WRAPPER */
+.create-wrapper{
+  max-width:800px;
+  margin:auto;
+}
+
+/* SECTION */
+.section{
+  margin-bottom:20px;
+  padding:20px;
+  border-radius:18px;
+}
+
+.section h3{
+  color:white;
+  margin-bottom:15px;
+}
+
+/* INPUTS */
+.input-dark{
+  width:100%;
+  margin-bottom:10px;
+  padding:12px;
+  border-radius:12px;
+  background:#111827;
+  border:1px solid rgba(255,255,255,0.08);
+  color:white;
+}
+
+/* HINT */
+.hint{
+  color:#888;
+  font-size:12px;
+}
+
+/* SUBMIT */
+.submit-area{
+  text-align:right;
+  margin-top:20px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+  .create-hero h1{
+    font-size:28px;
+  }
+
+  .submit-area{
+    text-align:center;
+  }
+}
+
+</style>
+
+<!-- =========================
+ AJAX LGA
+========================= -->
+
 <script>
+
 document.getElementById("state").addEventListener("change", function () {
+
     const state = this.value;
     const lgaSelect = document.getElementById("lga");
 
     lgaSelect.innerHTML = "<option>Loading...</option>";
 
     fetch(`/get-lgas?state=${state}`)
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-            lgaSelect.innerHTML = "<option value=''>Select LGA</option>";
+
+            lgaSelect.innerHTML = "<option>Select LGA</option>";
 
             data.forEach(lga => {
-                lgaSelect.innerHTML += `<option value="${lga}">${lga}</option>`;
+                lgaSelect.innerHTML +=
+                `<option value="${lga}">${lga}</option>`;
             });
+
         })
         .catch(() => {
-            lgaSelect.innerHTML = "<option>Error loading LGAs</option>";
+            lgaSelect.innerHTML =
+            "<option>Error loading LGAs</option>";
         });
+
+});
+
+</script>
+
+<script>
+const amountInput = document.getElementById("amount");
+const platformAmount = document.getElementById("platform-amount");
+
+amountInput.addEventListener("input", function () {
+
+    const amount = parseFloat(this.value);
+
+    if (!amount || amount <= 0) {
+        platformAmount.innerHTML = "";
+        return;
+    }
+
+    const fee = amount * 0.10;
+    const total = amount + fee;
+
+    platformAmount.innerHTML = `
+        Platform fee (10%): ₦${fee.toFixed(2)} <br>
+        Total attendee pays: ₦${total.toFixed(2)}
+    `;
 });
 </script>
 
-
 {% endblock %}
+

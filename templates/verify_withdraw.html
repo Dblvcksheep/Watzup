@@ -3,115 +3,64 @@
 
 {% block content %}
 
-<section style="max-width: 620px; margin: auto;">
+<div class="container mt-4" style="max-width: 600px;">
 
-  <h2 class="section-title">Verify Withdrawal</h2>
-  <p class="section-desc">
-    Enter the verification code sent to your email.
-  </p>
+  <!-- HEADER -->
+  <div class="mb-4">
+    <h3 class="fw-bold mb-1">Verify Withdrawal</h3>
+    <p class="text-secondary mb-0">
+      Enter the verification code sent to your email.
+    </p>
+  </div>
 
-  <form method="POST" class="card">
+  <!-- CARD -->
+  <div class="glass-card p-4">
 
-    <div class="form-group">
-      <label>Verification Code</label>
-      <input
-        type="text"
-        name="code"
-        placeholder="Enter 6-digit code"
-        maxlength="6"
-        inputmode="numeric"
-        required
-      >
-      <small>Check your email inbox or spam folder.</small>
-    </div>
+    <form method="POST">
 
-    <!-- Actions -->
-    <div class="actions">
-      <button type="submit">Confirm Withdrawal</button>
-      <a href="{{ url_for('dashboard') }}">Cancel</a>
-    </div>
+      <!-- CODE INPUT -->
+      <div class="mb-3">
+        <label class="form-label text-secondary small">
+          Verification Code
+        </label>
 
-  </form>
+        <input type="text"
+               name="code"
+               class="form-control search-input"
+               placeholder="Enter 6-digit code"
+               maxlength="6"
+               inputmode="numeric"
+               style="letter-spacing: 4px;"
+               required>
 
-</section>
+        <small class="text-secondary d-block mt-2">
+          Check your email inbox or spam folder.
+        </small>
+      </div>
 
-<style>
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 22px;
-  }
+      <!-- ACTIONS -->
+      <div class="d-flex gap-2 flex-wrap mt-4">
 
-  .form-group label {
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
+        <button type="submit"
+                class="btn-primary-custom flex-fill">
 
-  .form-group input {
-    padding: 14px 16px;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    background: rgba(255,255,255,0.03);
-    color: var(--text);
-    font-size: 0.95rem;
-    outline: none;
-    letter-spacing: 2px; /* makes code easier to read */
-  }
+          Confirm Withdrawal
 
-  .form-group input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent-soft);
-  }
+        </button>
 
-  .form-group small {
-    margin-top: 6px;
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
+        <a href="{{ url_for('dashboard') }}"
+           class="btn-light-custom flex-fill text-center">
 
-  .actions {
-    display: flex;
-    gap: 16px;
-    margin-top: 30px;
-    flex-wrap: wrap;
-  }
+          Cancel
 
-  .actions button {
-    padding: 14px 28px;
-    border-radius: 999px;
-    border: none;
-    background: var(--accent);
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-  }
+        </a>
 
-  .actions button:hover {
-    opacity: 0.9;
-  }
+      </div>
 
-  .actions a {
-    padding: 14px 28px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
+    </form>
 
-  .actions a:hover {
-    border-color: var(--accent);
-    color: var(--text);
-  }
+  </div>
 
-  @media (max-width: 600px) {
-    section {
-      padding: 0 8px;
-    }
-  }
-</style>
+</div>
 
 {% endblock %}

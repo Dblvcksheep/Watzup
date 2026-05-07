@@ -191,13 +191,5 @@ def nombank_confirm(reference, acct_id, access_token):
 
     return response.json()
 
-access = nombank_access_token(client_id,client_seccret,account_id)
-if access['description'] == 'Successful':
-    access_token = access['data']['access_token']
 
-virtual=create_virtual(access_token,account_id,"watzup-12345-ref","leonard name")
-
-print(virtual)
-
-revoke_access(access_token, client_id)
 

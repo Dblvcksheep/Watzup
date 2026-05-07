@@ -1,37 +1,57 @@
 {% extends "base.html" %}
-{% block title %}Manage Attendee{% endblock %}
+{% block title %}Verify Attendee Action{% endblock %}
 
 {% block content %}
 
-<div class="auth-container">
+<div class="verify-wrapper">
 
-  <div class="auth-card shadow-soft rounded-soft">
+  <div class="verify-card glass-card">
 
-    <h2 class="auth-title">Verify Access</h2>
-    <p class="auth-subtitle">
-      Enter your password to manage attendees.
-    </p>
+    <!-- HEADER -->
+    <div class="verify-header">
 
-    <form method="POST">
-
-      <div class="form-group">
-        <label>Verification Code</label>
-        <input
-          type="password"
-          name="code"
-          placeholder="Enter your password"
-          required
-        >
+      <div class="verify-icon">
+        <i class="bi bi-shield-lock-fill"></i>
       </div>
 
-      <div class="actions">
-        <button type="submit" class="btn-primary-custom">
+      <h2>Secure Verification</h2>
+
+      <p>
+        Confirm your identity to manage event attendees
+      </p>
+
+    </div>
+
+    <!-- FORM -->
+    <form method="POST">
+
+      <div class="input-group-custom">
+
+        <label>Security Code</label>
+
+        <input type="password"
+               name="code"
+               placeholder="Enter your password"
+               required>
+
+      </div>
+
+      <div class="verify-actions">
+
+        <button type="submit"
+                class="btn-primary-custom flex-fill">
+
           Continue
+
         </button>
 
-        <a href="{{ url_for('index') }}" class="btn-light-custom">
+        <a href="{{ url_for('index') }}"
+           class="btn-light-custom flex-fill text-center">
+
           Cancel
+
         </a>
+
       </div>
 
     </form>
@@ -41,79 +61,142 @@
 </div>
 
 <style>
-.auth-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 70vh;
+
+/* =========================
+   WRAPPER
+========================= */
+
+.verify-wrapper{
+  min-height:75vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
 }
 
-.auth-card {
-    width: 100%;
-    max-width: 420px;
-    background: #fff;
-    padding: 28px;
-    border: 1px solid #eee;
+/* =========================
+   CARD
+========================= */
+
+.verify-card{
+  width:100%;
+  max-width:460px;
+  padding:36px;
 }
 
-.auth-title {
-    font-size: 22px;
-    font-weight: 600;
-    margin-bottom: 6px;
+/* =========================
+   HEADER
+========================= */
+
+.verify-header{
+  text-align:center;
+  margin-bottom:30px;
 }
 
-.auth-subtitle {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 20px;
+.verify-icon{
+  width:74px;
+  height:74px;
+  margin:0 auto 18px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  box-shadow:0 0 30px rgba(123,47,247,0.35);
 }
 
-/* Form */
-.form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
+.verify-icon i{
+  font-size:30px;
+  color:white;
 }
 
-.form-group label {
-    font-size: 13px;
-    margin-bottom: 6px;
-    color: #444;
+.verify-header h2{
+  font-size:28px;
+  font-weight:700;
+  margin-bottom:10px;
+  color:white;
 }
 
-.form-group input {
-    padding: 12px 14px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    font-size: 14px;
-    outline: none;
+.verify-header p{
+  color:var(--text-soft);
+  font-size:15px;
+  line-height:1.6;
 }
 
-.form-group input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+/* =========================
+   FORM
+========================= */
+
+.input-group-custom{
+  display:flex;
+  flex-direction:column;
+  margin-bottom:22px;
 }
 
-/* Actions */
-.actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
+.input-group-custom label{
+  font-size:14px;
+  margin-bottom:8px;
+  color:var(--text-soft);
 }
 
-.actions a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
+.input-group-custom input{
+  width:100%;
+  padding:15px 18px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.04);
+  color:white;
+  font-size:15px;
+  outline:none;
+  transition:0.25s ease;
 }
 
-/* Mobile */
-@media (max-width: 500px) {
-    .auth-card {
-        padding: 20px;
-    }
+.input-group-custom input::placeholder{
+  color:#8b8ba5;
 }
+
+.input-group-custom input:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(0,198,255,0.12);
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.verify-actions{
+  display:flex;
+  gap:14px;
+  margin-top:30px;
+}
+
+.verify-actions a{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:576px){
+
+  .verify-card{
+    padding:24px;
+  }
+
+  .verify-header h2{
+    font-size:24px;
+  }
+
+  .verify-actions{
+    flex-direction:column;
+  }
+
+}
+
 </style>
 
 {% endblock %}

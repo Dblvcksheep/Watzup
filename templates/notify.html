@@ -1,6 +1,140 @@
 {% extends 'base.html' %}
-{% block title %} {% endblock %}
+{% block title %}Notifications{% endblock %}
 
 {% block content %}
+
+<div class="container mt-4">
+
+  <!-- HEADER -->
+  <div class="mb-4">
+    <h3 class="fw-bold mb-1">Notifications</h3>
+    <p class="text-secondary mb-0">Latest updates and alerts</p>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="row g-3">
+
+    {% if notifys.items|length > 0 %}
+
+      {% for notify in notifys.items %}
+
+      <div class="col-12">
+
+        <div class="glass-card p-3">
+
+          <div class="d-flex justify-content-between align-items-start gap-3">
+
+            <div>
+
+              <p class="text-white mb-2">
+                {{ notify.message }}
+              </p>
+
+              {% if notify.expire_at %}
+              <small class="text-secondary">
+                {{ notify.expire_at.strftime('%b %d, %Y %I:%M %p') }}
+              </small>
+              {% endif %}
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {% endfor %}
+
+    {% else %}
+
+      <div class="col-12">
+
+        <div class="glass-card p-5 text-center">
+
+          <h5 class="text-white mb-2">No notifications yet</h5>
+          <p class="text-secondary mb-0">
+            You’ll see updates here when they arrive
+          </p>
+
+        </div>
+
+      </div>
+
+    {% endif %}
+
+  </div>
+
+  <!-- PAGINATION -->
+  {% if notifys.pages > 1 %}
+
+  <nav class="mt-5">
+
+    <ul class="pagination justify-content-center">
+
+      <!-- PREVIOUS -->
+      <li class="page-item {% if not notifys.has_prev %}disabled{% endif %}">
+
+        <a class="page-link"
+           href="{{ url_for('notification', page=notifys.prev_num)
+                    if notifys.has_prev else '#' }}">
+
+          Previous
+
+        </a>
+
+      </li>
+
+      <!-- PAGES -->
+      {% for page_num in notifys.iter_pages(
+          left_edge=2,
+          right_edge=2,
+          left_current=2,
+          right_current=2
+      ) %}
+
+        {% if page_num %}
+
+        <li class="page-item {% if page_num == notifys.page %}active{% endif %}">
+
+          <a class="page-link"
+             href="{{ url_for('notification', page=page_num) }}">
+
+            {{ page_num }}
+
+          </a>
+
+        </li>
+
+        {% else %}
+
+        <li class="page-item disabled">
+          <span class="page-link">...</span>
+        </li>
+
+        {% endif %}
+
+      {% endfor %}
+
+      <!-- NEXT -->
+      <li class="page-item {% if not notifys.has_next %}disabled{% endif %}">
+
+        <a class="page-link"
+           href="{{ url_for('notification', page=notifys.next_num)
+                    if notifys.has_next else '#' }}">
+
+          Next
+
+        </a>
+
+      </li>
+
+    </ul>
+
+  </nav>
+
+  {% endif %}
+
+</div>
 
 {% endblock %}

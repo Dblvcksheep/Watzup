@@ -5,123 +5,258 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Watzup{% endblock %}</title>
 
-  <!-- Bootstrap 5 -->
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Google Font (clean, modern) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-/* ===== Global ===== */
-body {
-  font-family: 'Inter', sans-serif;
-  background: #f8f9fb;
-  color: #1a1a1a;
+
+/* =========================
+   GLOBAL
+========================= */
+
+:root{
+  --bg-main: #0F0F1A;
+  --bg-card: #1A1A2E;
+  --purple: #7B2FF7;
+  --blue: #00C6FF;
+  --text-main: #ffffff;
+  --text-soft: #b8b8c5;
+  --border: rgba(255,255,255,0.08);
 }
 
-/* ===== Navbar ===== */
-.navbar {
-  background: #ffffff;
-  border-bottom: 1px solid #eee;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-.navbar-brand {
-  font-weight: 600;
-  font-size: 20px;
-  letter-spacing: -0.3px;
+body{
+  font-family:'Inter',sans-serif;
+  background:
+    linear-gradient(rgba(15,15,26,0.92), rgba(15,15,26,0.96)),
+    url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=2070&auto=format&fit=crop');
+  background-size:cover;
+  background-attachment:fixed;
+  background-position:center;
+  color:var(--text-main);
+  min-height:100vh;
 }
 
-.nav-link {
-  font-size: 14px;
-  color: #444 !important;
+/* Smooth scrolling */
+html{
+  scroll-behavior:smooth;
 }
 
-.nav-link:hover {
-  color: #000 !important;
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar{
+  background: rgba(15,15,26,0.88);
+  backdrop-filter: blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:14px 0;
 }
 
-/* ===== Primary Button Style ===== */
-.btn-primary-custom {
-  background: #2563eb;
-  border: none;
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-size: 14px;
+.navbar-brand{
+  font-size:24px;
+  font-weight:700;
+  color:#fff !important;
+  letter-spacing:-1px;
 }
 
-.btn-primary-custom:hover {
-  background: #1e4ed8;
+.navbar-brand span{
+  background:linear-gradient(90deg,var(--purple),var(--blue));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
 
-/* ===== Secondary Button ===== */
-.btn-light-custom {
-  background: #f1f3f5;
-  border: none;
-  color: #333;
-  border-radius: 6px;
-  font-size: 14px;
+.nav-link{
+  color:var(--text-soft) !important;
+  font-size:14px;
+  font-weight:500;
+  transition:0.25s ease;
 }
 
-.btn-light-custom:hover {
-  background: #e2e6ea;
+.nav-link:hover{
+  color:#fff !important;
 }
 
-/* ===== Flash Messages ===== */
-.alert {
-  font-size: 14px;
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-primary-custom{
+  background:linear-gradient(90deg,var(--purple),var(--blue));
+  border:none;
+  color:white;
+  padding:10px 18px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:600;
+  transition:0.25s ease;
+  box-shadow:0 0 18px rgba(123,47,247,0.35);
 }
 
-/* ===== Main Layout ===== */
-main.container {
-  max-width: 1100px;
+.btn-primary-custom:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 25px rgba(0,198,255,0.35);
 }
 
-/* ===== Footer ===== */
-footer {
-  background: #ffffff;
-  border-top: 1px solid #eee;
-  color: #777;
-  text-align: center;
-  padding: 1.2rem 0;
-  font-size: 13px;
+.btn-light-custom{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  color:#fff;
+  border-radius:12px;
+  padding:10px 18px;
+  font-size:14px;
+  transition:0.25s ease;
 }
 
-/* ===== Utility ===== */
-.shadow-soft {
-  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+.btn-light-custom:hover{
+  background:rgba(255,255,255,0.12);
 }
 
-.rounded-soft {
-  border-radius: 10px;
+/* =========================
+   FLASH MESSAGES
+========================= */
+
+.alert{
+  background:#1A1A2E;
+  border:1px solid rgba(255,255,255,0.08);
+  color:white;
+  border-radius:14px;
 }
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+main.container{
+  max-width:1200px;
+  padding-top:30px;
+  padding-bottom:60px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.glass-card{
+  background:rgba(26,26,46,0.88);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:20px;
+  backdrop-filter:blur(14px);
+  box-shadow:0 0 25px rgba(0,0,0,0.25);
+  overflow:hidden;
+}
+
+/* =========================
+   HERO SECTION
+========================= */
+
+.hero-section{
+  padding:80px 0 50px;
+}
+
+.hero-title{
+  font-size:56px;
+  font-weight:700;
+  line-height:1.1;
+  margin-bottom:20px;
+}
+
+.hero-title span{
+  background:linear-gradient(90deg,var(--purple),var(--blue));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.hero-sub{
+  max-width:700px;
+  color:var(--text-soft);
+  font-size:18px;
+  line-height:1.7;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  background:#0B0B14;
+  border-top:1px solid rgba(255,255,255,0.05);
+  color:#888;
+  text-align:center;
+  padding:25px 0;
+  font-size:13px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px){
+
+  .hero-title{
+    font-size:38px;
+  }
+
+  .navbar{
+    padding:12px 0;
+  }
+
+  .btn-primary-custom,
+  .btn-light-custom{
+    width:100%;
+    margin-top:10px;
+  }
+
+  .navbar-nav{
+    padding-top:15px;
+  }
+
+}
+
 </style>
+</head>
 
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg">
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg sticky-top">
   <div class="container">
 
     <a class="navbar-brand" href="{{ url_for('index') }}">
-      Watzup
+      <span>Watzup</span>
     </a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+    <button class="navbar-toggler border-0 shadow-none"
+            type="button"
+            data-bs-toggle="collapse"
             data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
+
+      <i class="bi bi-list text-white fs-2"></i>
+
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
 
       {% if current_user.is_authenticated %}
-      <ul class="navbar-nav me-auto">
+      <ul class="navbar-nav me-auto ms-3">
 
         {% if current_user.is_admin or current_user.id == 1 %}
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('users') }}">Users</a>
         </li>
+
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('events') }}">Events</a>
         </li>
@@ -132,84 +267,102 @@ footer {
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="#">About Us</a>
+          <a class="nav-link" href="{{ url_for('about') }}">About</a>
         </li>
 
       </ul>
       {% endif %}
 
-      <!-- Right Side -->
-      <ul class="navbar-nav ms-auto align-items-center">
+      <!-- RIGHT SIDE -->
+      <ul class="navbar-nav ms-auto align-items-lg-center">
 
         {% if current_user.is_authenticated %}
 
-        <li class="nav-item me-2">
-          <a class="nav-link" href="{{ url_for('profile', user_id=current_user.id) }}">Profile</a>
+        <li class="nav-item me-lg-3">
+          <a class="nav-link"
+          href="{{ url_for('profile', user_id=current_user.id) }}">
+            <i class="bi bi-person-circle"></i> Profile
+          </a>
         </li>
 
         {% if current_user.bank and current_user.bank.acct_number %}
-        <li class="nav-item me-2">
-          <a class="nav-link" href="{{ url_for('wallet') }}">₦ {{ current_user.wallet }}</a>
+        <li class="nav-item me-lg-3">
+          <a class="nav-link" href="{{ url_for('wallet') }}">
+            💰 ₦ {{ current_user.wallet }}
+          </a>
         </li>
         {% else %}
-        <li class="nav-item me-2">
-          <a class="nav-link" href="{{ url_for('generate_bank') }}">₦ {{ current_user.wallet }}</a>
+        <li class="nav-item me-lg-3">
+          <a class="nav-link" href="{{ url_for('generate_bank') }}">Generate Acct</a>
         </li>
-
         {% endif %}
 
-
         <li class="nav-item">
-          <a class="btn btn-light-custom" href="{{ url_for('logout') }}">
+          <a class="btn btn-light-custom"
+             href="{{ url_for('logout') }}">
             Logout
           </a>
         </li>
 
         {% else %}
 
-        <li class="nav-item me-2">
-          <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+        <li class="nav-item me-lg-3">
+          <a class="nav-link"
+             href="{{ url_for('login') }}">
+            Login
+          </a>
         </li>
 
         <li class="nav-item">
-          <a class="btn btn-primary-custom" href="{{ url_for('register') }}">
+          <a class="btn btn-primary-custom"
+             href="{{ url_for('register') }}">
             Get Started
           </a>
         </li>
 
         {% endif %}
+
       </ul>
 
     </div>
   </div>
 </nav>
 
-<!-- Flash Messages -->
+<!-- FLASH -->
 {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="container mt-3">
-      {% for category, message in messages %}
-        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show shadow-soft rounded-soft">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
+{% if messages %}
+<div class="container mt-4">
+  {% for category, message in messages %}
+
+  <div class="alert alert-dismissible fade show glass-card">
+
+    {{ message }}
+
+    <button type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="alert"></button>
+
+  </div>
+
+  {% endfor %}
+</div>
+{% endif %}
 {% endwith %}
 
-<!-- Content -->
-<main class="container min-vh-100 mt-4">
+<!-- MAIN -->
+<main class="container min-vh-100">
   {% block content %}{% endblock %}
 </main>
 
-<!-- Footer -->
+<!-- FOOTER -->
 <footer>
   <div class="container">
-    &copy; {{ current_year if current_year else 2026 }} Watzup. Built for events.
+    © {{ current_year if current_year else 2026 }}
+    Watzup • Discover Events Anywhere
   </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

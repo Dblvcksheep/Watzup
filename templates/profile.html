@@ -1,78 +1,223 @@
 {% extends 'base.html' %}
-{% block title %}{{ user.name }}{% endblock %}
+{% block title %}{{ user.name }} | Watzup Profile{% endblock %}
 
 {% block content %}
 
-<div class="profile-img">
-  <img id="profilePic"
-       src="{% if user.profile_image and user.profile_image.image_url %}
-              {{ url_for('static', filename=user.profile_image.image_url) }}
-            {% else %}
-              {{ url_for('static', filename='images/default-avatar.jpg') }}
-            {% endif %}"
-       alt="Profile Image"
-       style="cursor: pointer;">
-</div>
+<!-- =========================
+ PROFILE WRAPPER
+========================= -->
 
-<!-- Modal -->
-<div id="imgModal" class="modal">
-  <span class="close">&times;</span>
-  <img class="modal-content" id="fullImg">
-</div>
+<div class="profile-wrapper container">
 
-<h2>{{ user.name }}</h2>
+  <!-- PROFILE CARD -->
+  <div class="glass-card profile-card">
 
-<p>Age: {{ age }} years</p>
-<p>Gender: {{ user.gender }}</p>
-<p>State: {{ user.state }}</p>
-<p>LGA: {{ user.lga }}</p>
+    <!-- AVATAR -->
+    <div class="profile-avatar">
 
-{% if current_user.id == user.id %}
+      <img id="profilePic"
+           src="{% if user.profile_image and user.profile_image.image_url %}
+                  {{ url_for('static', filename=user.profile_image.image_url) }}
+                {% else %}
+                  {{ url_for('static', filename='images/default-avatar.png') }}
+                {% endif %}"
+           alt="Profile Image">
 
-  <a class="btn" href="{{ url_for('edit_profile', user_id=user.id) }}">
-    Edit Profile
-  </a>
+    </div>
 
-  <div style="margin-top: 10px;">
-    <strong>Wallet Balance:</strong>
-    ₦ {{ "{:,.2f}".format(user.wallet or 0) }}
+    <!-- USER INFO -->
+    <div class="profile-info">
+
+      <h2 class="name">{{ user.name }}</h2>
+
+      <p class="muted">
+        {{ user.gender }} • {{ age }} years
+      </p>
+
+      <p class="muted">
+        📍 {{ user.state }}, {{ user.lga }}
+      </p>
+
+      <p class="email">
+        {{ user.email }}
+      </p>
+
+    </div>
+
+    <!-- WALLET -->
+    {% if current_user.id == user.id %}
+
+    <div class="wallet-box">
+
+      <div class="wallet-label">Wallet Balance</div>
+
+      <div class="wallet-value">
+        ₦ {{ "{:,.2f}".format(user.wallet or 0) }}
+      </div>
+
+    </div>
+
+    {% endif %}
+
+    <!-- ACTIONS -->
+    {% if current_user.id == user.id %}
+
+    <div class="profile-actions">
+
+      <a class="btn btn-primary-custom"
+         href="{{ url_for('edit_profile', user_id=user.id) }}">
+
+        Edit Profile
+
+      </a>
+
+    </div>
+
+    {% endif %}
+
   </div>
 
-  <p>{{ user.email }}</p>
+</div>
 
-{% endif %}
+<!-- =========================
+ IMAGE MODAL
+========================= -->
+
+<div id="imgModal" class="modal">
+
+  <span class="close">&times;</span>
+
+  <img class="modal-content" id="fullImg">
+
+</div>
+
+<!-- =========================
+ STYLES
+========================= -->
 
 <style>
+
+/* WRAPPER */
+.profile-wrapper{
+  display:flex;
+  justify-content:center;
+  padding:40px 15px;
+}
+
+/* CARD */
+.profile-card{
+  width:100%;
+  max-width:500px;
+  padding:30px;
+  text-align:center;
+  border-radius:24px;
+}
+
+/* AVATAR */
+.profile-avatar{
+  display:flex;
+  justify-content:center;
+  margin-bottom:20px;
+}
+
+.profile-avatar img{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid transparent;
+  background:linear-gradient(135deg,#7B2FF7,#00C6FF);
+  padding:3px;
+  cursor:pointer;
+}
+
+/* INFO */
+.name{
+  color:white;
+  font-weight:800;
+  margin-bottom:5px;
+}
+
+.muted{
+  color:#aaa;
+  font-size:14px;
+  margin:4px 0;
+}
+
+.email{
+  color:#ccc;
+  font-size:13px;
+  margin-top:8px;
+}
+
+/* WALLET */
+.wallet-box{
+  margin-top:20px;
+  padding:15px;
+  border-radius:16px;
+  background:rgba(123,47,247,0.08);
+  border:1px solid rgba(123,47,247,0.2);
+}
+
+.wallet-label{
+  font-size:12px;
+  color:#aaa;
+}
+
+.wallet-value{
+  font-size:22px;
+  font-weight:700;
+  background:linear-gradient(90deg,#7B2FF7,#00C6FF);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* ACTIONS */
+.profile-actions{
+  margin-top:20px;
+}
+
+/* MODAL */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  padding-top: 60px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.9);
+  display:none;
+  position:fixed;
+  z-index:999;
+  inset:0;
+  background:rgba(0,0,0,0.9);
 }
 
 .modal-content {
-  margin: auto;
-  display: block;
-  max-width: 90%;
-  max-height: 80%;
+  margin:auto;
+  display:block;
+  max-width:90%;
+  max-height:90%;
+  border-radius:12px;
 }
 
 .close {
-  position: absolute;
-  top: 20px;
-  right: 35px;
-  color: white;
-  font-size: 40px;
-  cursor: pointer;
+  position:absolute;
+  top:20px;
+  right:30px;
+  color:white;
+  font-size:40px;
+  cursor:pointer;
 }
+
+/* MOBILE */
+@media(max-width:768px){
+  .profile-card{
+    padding:20px;
+  }
+}
+
 </style>
 
+<!-- =========================
+ SCRIPT
+========================= -->
+
 <script>
+
 const modal = document.getElementById("imgModal");
 const img = document.getElementById("profilePic");
 const modalImg = document.getElementById("fullImg");
@@ -92,6 +237,8 @@ modal.onclick = function (e) {
     modal.style.display = "none";
   }
 }
+
 </script>
 
 {% endblock %}
+

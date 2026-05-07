@@ -3,144 +3,591 @@
 
 {% block content %}
 
-<header class="container-fluid py-5 bg-gradient position-relative" style="background: linear-gradient(135deg, #f0f4ff 0%, #e2e8f0 100%);">
-    <!-- Optional decorative shapes -->
-<!--    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('/static/images/hero-bg-shapes.svg') no-repeat center/cover; opacity: 0.1;"></div>-->
+<!-- =========================
+ HERO SECTION
+========================= -->
 
-    <div class="row justify-content-center align-items-center g-5 py-5 position-relative" style="z-index: 1;">
-        <div class="col-lg-8 text-center">
-            <!-- Main Heading -->
-            <h1 class="display-3 fw-bold text-dark lh-sm mb-4" style="font-family: 'Inter', sans-serif;">
-                Home of <span class="text-primary position-relative" style="font-weight: 900;">
-                    Events
-                    <span class="position-absolute start-0 bottom-0 w-100" style="height:4px; background: linear-gradient(90deg,#4f46e5,#3b82f6); border-radius:2px; animation: shimmer 2s infinite;"></span>
-                </span>
-            </h1>
+<section class="hero-section mb-5">
 
-            <!-- Subheading -->
-            <p class="lead text-secondary mx-auto mb-4" style="max-width: 600px; font-size: 1.2rem;">
-                From event creation to attendee management and ticket sales, streamline your entire event experience on one platform.
-            </p>
+  <div class="hero-overlay"></div>
 
-            <!-- Call to Action Buttons -->
-            <div class="d-flex gap-3 justify-content-center mt-4 flex-wrap">
-                {% if not current_user.is_authenticated %}
-                    <a href="{{ url_for('register') }}" class="btn btn-dark btn-lg px-5 py-3 shadow-lg text-white" style="transition: transform 0.3s, box-shadow 0.3s;">
-                        Get Started
-                    </a>
-                    <a href="{{ url_for('login') }}" class="btn btn-outline-dark btn-lg px-5 py-3 shadow-lg" style="transition: transform 0.3s, box-shadow 0.3s;">
-                        Sign In
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</header>
+  <div class="container position-relative">
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h3 class="fw-bold">Explore Events</h3>
+    <div class="row align-items-center min-vh-50">
 
-  {% if current_user.is_authenticated %}
-  <a href="{{ url_for('create_event') }}" class="btn btn-primary">
-    + Create Event
-  </a>
-  {% endif %}
-</div>
+      <!-- LEFT -->
+      <div class="col-lg-7">
 
-<!-- Events Grid -->
-<div class="row g-4">
+        <span class="hero-badge">
+          🎟️ Discover Events Around You
+        </span>
 
-  {% for event in events.items %}
-  <div class="col-md-6 col-lg-4 col-xl-3">
+        <h1 class="hero-title mt-4">
+          The Home of
+          <span>Experiences</span>
+        </h1>
 
-    <a href="{{ url_for('event_detail', event_id=event.id) }}" class="text-decoration-none text-dark">
-      <div class="card shadow-sm h-100 event-card">
+        <p class="hero-sub mt-4">
+          Discover concerts, parties, tech meetups,
+          hangouts and unforgettable experiences —
+          all in one place.
+        </p>
 
+        {% if not current_user.is_authenticated %}
 
-        <!-- Event Image -->
-        <div class="event-img-wrapper">
-          <img src="{% if event.cover_img %}
-                        {{ url_for('static', filename=event.cover_img) }}
-                    {% else %}
-                        {{ url_for('static', filename='images/default-avatar.jpg') }}
-                    {% endif %}"
-               class="card-img-top"
-               alt="Event Image"
-               style="aspect-ratio: 16/9; object-fit: cover;">
+        <div class="d-flex flex-wrap gap-3 mt-4">
+
+          <a href="{{ url_for('register') }}"
+             class="btn btn-primary-custom btn-lg">
+
+            Get Started
+
+          </a>
+
+          <a href="{{ url_for('login') }}"
+             class="btn btn-light-custom btn-lg">
+
+            Sign In
+
+          </a>
+
         </div>
 
-        <!-- Event Info -->
-        <div class="card-body">
-          <h6 class="fw-bold mb-2">
-            {{ event.title }}
-          </h6>
+        {% endif %}
 
-          <p class="text-muted small mb-1">
-            {{ event.state or "Unknown location" }}
-          </p>
+      </div>
 
-          <p class="text-muted small mb-0">
-            {{ event.event_date.strftime('%b %d, %Y • %I:%M %p') if event.event_date else "" }}
-          </p>
+      <!-- RIGHT IMAGE -->
+      <div class="col-lg-5 d-none d-lg-block">
+
+        <div class="hero-image-wrapper">
+
+          <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=2070&auto=format&fit=crop"
+               class="hero-image">
+
         </div>
 
       </div>
-    </a>
+
+    </div>
 
   </div>
 
-  {% else %}
-    <div class="col-12 text-center mt-5">
-      <h5 class="text-muted">No events in your region</h5>
-      <p class="text-muted">Be the first to create one 🚀</p>
+</section>
+
+<!-- =========================
+ SEARCH SECTION
+========================= -->
+
+<section class="glass-card p-4 mb-5">
+
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+    <div>
+      <h3 class="fw-bold mb-1 text-white">
+        Explore Events
+      </h3>
+
+      <p class="text-secondary mb-0">
+        Find trending experiences near you
+      </p>
     </div>
-  {% endfor %}
+
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('create_event') }}"
+       class="btn btn-primary-custom">
+
+      + Create Event
+
+    </a>
+    {% endif %}
+
+  </div>
+
+  <!-- SEARCH FORM -->
+  <form method="GET"
+        action="{{ url_for('index') }}"
+        class="row g-3">
+
+    <!-- SEARCH -->
+    <div class="col-lg-5">
+
+      <input type="text"
+             name="q"
+             value="{{ query }}"
+             placeholder="Search events, states, categories..."
+             class="form-control search-input">
+
+    </div>
+
+    <!-- CATEGORY -->
+    <div class="col-lg-4">
+
+      <select name="category"
+              class="form-select search-input"
+              onchange="this.form.submit()">
+
+            <option value="">Select category</option>
+            <option value="party" {% if category == 'party' %}selected{% endif %}>Party</option>
+            <option value="hangout" {% if category == 'hangout' %}selected{% endif %}>Hangout</option>
+            <option value="business and networking" {% if category == 'business and networking' %}selected{% endif %}>Business & Networking</option>
+            <option value="tech innovation" {% if category == 'tech innovation' %}selected{% endif %}>Tech & Innovation</option>
+            <option value="education and training" {% if category == 'education and training' %}selected{% endif %}>Education & Training</option>
+            <option value="entertainment and shows" {% if category == 'entertainment and shows' %}selected{% endif %}>Entertainment & Shows</option>
+            <option value="sports and fitness" {% if category == 'sports and fitness' %}selected{% endif %}>Sports & Fitness</option>
+            <option value="religious and spiritual" {% if category == 'religious and spiritual' %}selected{% endif %}>Religious & Spiritual</option>
+            <option value="weddings/birthdays" {% if category == 'weddings/birthdays' %}selected{% endif %}>Weddings/Birthdays</option>
+            <option value="community and social impact" {% if category == 'community and social impact' %}selected{% endif %}>Community & Social Impact</option>
+            <option value="others" {% if category == 'others' %}selected{% endif %}>Others</option>
+
+      </select>
+
+    </div>
+
+    <!-- BUTTON -->
+    <div class="col-lg-3">
+
+      <button type="submit"
+              class="btn btn-primary-custom w-100 h-100">
+
+        Search Events
+
+      </button>
+
+    </div>
+
+  </form>
+
+</section>
+
+<!-- =========================
+ EVENTS GRID
+========================= -->
+
+<div class="row g-4">
+
+{% for event in events.items %}
+
+<div class="col-md-6 col-xl-3">
+
+  <a href="{{ url_for('event_detail', event_id=event.id) }}"
+     class="text-decoration-none">
+
+    <div class="event-card h-100">
+
+      <!-- IMAGE -->
+      <div class="event-image-wrapper">
+
+        <img src="{% if event.cover_img %}
+                    {{ url_for('static', filename=event.cover_img) }}
+                  {% else %}
+                    https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2070&auto=format&fit=crop
+                  {% endif %}"
+
+             class="event-image">
+
+        <!-- OVERLAY -->
+        <div class="event-overlay"></div>
+
+        <!-- TYPE -->
+        <div class="event-type">
+
+          {{ event.event_type }}
+
+        </div>
+
+      </div>
+
+      <!-- BODY -->
+      <div class="event-body">
+
+        <div class="d-flex justify-content-between align-items-start">
+
+          <h5 class="event-title">
+            {{ event.title }}
+          </h5>
+
+          <button class="like-btn">
+            ❤️
+          </button>
+
+        </div>
+
+        {% if event.event_type == 'paid' %}
+        <div class="price-tag mt-2">
+          ₦{{ event.platform_amount }}
+        </div>
+        {% endif %}
+
+        <div class="event-meta mt-3">
+
+          <p>
+            📍 {{ event.state or "Unknown location" }}
+          </p>
+
+          <p>
+            🎫 {{ event.category }}
+          </p>
+
+          <p>
+            🗓️
+            {{ event.event_date.strftime('%b %d, %Y • %I:%M %p')
+            if event.event_date else "" }}
+          </p>
+
+        </div>
+
+        <!-- STATUS -->
+        <div class="mt-3">
+
+        {% if event.event_date and event.end_date %}
+
+          {% if now < event.event_date %}
+
+          <span class="status upcoming">
+            Upcoming
+          </span>
+
+          {% elif event.event_date <= now <= event.end_date %}
+
+          <span class="status ongoing">
+            Live Now
+          </span>
+
+          {% else %}
+
+          <span class="status ended">
+            Ended
+          </span>
+
+          {% endif %}
+
+        {% endif %}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </a>
 
 </div>
 
-<!-- Pagination -->
+{% else %}
+
+<div class="col-12">
+
+  <div class="glass-card p-5 text-center">
+
+    <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
+         width="120"
+         class="mb-4 opacity-75">
+
+    <h4 class="text-white">
+      No events found
+    </h4>
+
+    <p class="text-secondary">
+      Be the first to create something amazing 🚀
+    </p>
+
+  </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<!-- =========================
+ PAGINATION
+========================= -->
+
 {% if events.pages > 1 %}
+
 <nav class="mt-5">
+
   <ul class="pagination justify-content-center">
 
-    <!-- Previous -->
     <li class="page-item {% if not events.has_prev %}disabled{% endif %}">
-      <a class="page-link" href="{{ url_for('index', page=events.prev_num) if events.has_prev else '#' }}">
-        Previous
+
+      <a class="page-link"
+      href="{{ url_for('index',
+      page=events.prev_num,
+      q=query,
+      category=category)
+      if events.has_prev else '#' }}">
+
+      Previous
+
       </a>
+
     </li>
 
-    <!-- Page Numbers -->
-    {% for page_num in events.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+    {% for page_num in events.iter_pages(left_edge=2,
+    right_edge=2,
+    left_current=2,
+    right_current=2) %}
+
       {% if page_num %}
-        <li class="page-item {% if page_num == events.page %}active{% endif %}">
-          <a class="page-link" href="{{ url_for('index', page=page_num) }}">
-            {{ page_num }}
-          </a>
-        </li>
-      {% else %}
-        <li class="page-item disabled"><span class="page-link">...</span></li>
+
+      <li class="page-item
+      {% if page_num == events.page %}active{% endif %}">
+
+        <a class="page-link"
+        href="{{ url_for('index',
+        page=page_num,
+        q=query,
+        category=category) }}">
+
+        {{ page_num }}
+
+        </a>
+
+      </li>
+
       {% endif %}
+
     {% endfor %}
 
-    <!-- Next -->
     <li class="page-item {% if not events.has_next %}disabled{% endif %}">
-      <a class="page-link" href="{{ url_for('index', page=events.next_num) if events.has_next else '#' }}">
-        Next
+
+      <a class="page-link"
+      href="{{ url_for('index',
+      page=events.next_num,
+      q=query,
+      category=category)
+      if events.has_next else '#' }}">
+
+      Next
+
       </a>
+
     </li>
 
   </ul>
+
 </nav>
+
 {% endif %}
-<br>
 
 <style>
-    @keyframes shimmer {
-        0% { transform: translateX(-100%); }
-        50% { transform: translateX(0); }
-        100% { transform: translateX(100%); }
-    }
+
+/* =========================
+ HERO
+========================= */
+
+.hero-section{
+  position:relative;
+  padding:80px 0;
+}
+
+.hero-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:10px 16px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:30px;
+  color:#fff;
+  font-size:14px;
+}
+
+.hero-title{
+  font-size:72px;
+  font-weight:800;
+  line-height:1.05;
+  color:white;
+}
+
+.hero-title span{
+  background:linear-gradient(90deg,#7B2FF7,#00C6FF);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.hero-sub{
+  max-width:620px;
+  color:#b8b8c5;
+  font-size:18px;
+  line-height:1.8;
+}
+
+.hero-image-wrapper{
+  position:relative;
+}
+
+.hero-image{
+  width:100%;
+  border-radius:28px;
+  object-fit:cover;
+  height:520px;
+  box-shadow:0 0 40px rgba(123,47,247,0.3);
+}
+
+/* =========================
+ SEARCH
+========================= */
+
+.search-input{
+  background:#111827 !important;
+  border:1px solid rgba(255,255,255,0.06);
+  color:white !important;
+  height:58px;
+  border-radius:14px;
+}
+
+.search-input::placeholder{
+  color:#999;
+}
+
+/* =========================
+ EVENT CARD
+========================= */
+
+.event-card{
+  background:#1A1A2E;
+  border-radius:22px;
+  overflow:hidden;
+  transition:0.3s ease;
+  border:1px solid rgba(255,255,255,0.05);
+  height:100%;
+}
+
+.event-card:hover{
+  transform:translateY(-8px);
+  box-shadow:0 0 30px rgba(123,47,247,0.2);
+}
+
+.event-image-wrapper{
+  position:relative;
+}
+
+.event-image{
+  width:100%;
+  height:230px;
+  object-fit:cover;
+}
+
+.event-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top,
+  rgba(0,0,0,0.65),
+  rgba(0,0,0,0.05));
+}
+
+.event-type{
+  position:absolute;
+  top:14px;
+  left:14px;
+  padding:8px 14px;
+  border-radius:30px;
+  background:rgba(15,15,26,0.7);
+  backdrop-filter:blur(8px);
+  color:white;
+  font-size:12px;
+  text-transform:capitalize;
+}
+
+.event-body{
+  padding:20px;
+}
+
+.event-title{
+  color:white;
+  font-size:18px;
+  font-weight:700;
+}
+
+.like-btn{
+  border:none;
+  background:none;
+  color:#ff5a7a;
+  font-size:18px;
+}
+
+.price-tag{
+  display:inline-block;
+  padding:8px 14px;
+  background:linear-gradient(90deg,#7B2FF7,#00C6FF);
+  border-radius:14px;
+  color:white;
+  font-size:13px;
+  font-weight:600;
+}
+
+.event-meta p{
+  color:#b8b8c5;
+  margin-bottom:10px;
+  font-size:14px;
+}
+
+.status{
+  display:inline-block;
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+}
+
+.upcoming{
+  background:rgba(59,130,246,0.12);
+  color:#60a5fa;
+}
+
+.ongoing{
+  background:rgba(16,185,129,0.12);
+  color:#34d399;
+}
+
+.ended{
+  background:rgba(255,255,255,0.08);
+  color:#cfcfcf;
+}
+
+/* =========================
+ PAGINATION
+========================= */
+
+.page-link{
+  background:#1A1A2E;
+  border:none;
+  color:white;
+  margin:0 5px;
+  border-radius:12px;
+}
+
+.page-item.active .page-link{
+  background:linear-gradient(90deg,#7B2FF7,#00C6FF);
+}
+
+/* =========================
+ MOBILE
+========================= */
+
+@media(max-width:768px){
+
+  .hero-title{
+    font-size:46px;
+  }
+
+  .hero-section{
+    padding:50px 0;
+  }
+
+  .hero-sub{
+    font-size:16px;
+  }
+
+  .event-image{
+    height:220px;
+  }
+
+}
+
 </style>
 
 {% endblock %}
+
