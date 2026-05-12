@@ -133,7 +133,7 @@
 
     <div class="glass-card p-3 mb-4">
 
-    <form method="GET" action="{{ url_for('users') }}">
+    <form method="GET" action="{{ url_for('event_detail', event_id=event.id) }}">
 
       <input type="text"
              name="q"
@@ -155,7 +155,7 @@
         user_id=attendee.user.id) }}"
            class="attendee-name">
 
-          👤 {{ attendee.user.name }}
+          👤 {{ attendee.name }}
 
         </a>
 

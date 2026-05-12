@@ -139,6 +139,7 @@ class Attendee(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     email = db.Column(db.String(225), nullable=False)
     name = db.Column(db.String(100), nullable=False)
+    in_attendance = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.now())
 
 class PrivateAttendee(db.Model):
