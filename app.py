@@ -137,6 +137,8 @@ class Attendee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    email = db.Column(db.String(225), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now())
 
 class PrivateAttendee(db.Model):
@@ -163,6 +165,7 @@ class Bank(db.Model):
 
 
 with app.app_context():
+
     db.create_all()
 
 limiter = Limiter(
@@ -1287,7 +1290,9 @@ def join_event(event_id):
 
     attend = Attendee(
         event_id=event_id,
-        user_id = current_user.id
+        user_id = current_user.id,
+        name = current_user.name,
+        email = current_user.email
     )
     db.session.add(attend)
     db.session.commit()
@@ -1365,7 +1370,21 @@ def event_detail(event_id):
     event = Event.query.get(event_id)
     joined = Attendee.query.filter_by(event_id=event_id, user_id=current_user.id).first()
     already_set = SetReminder.query.filter_by(event_id=event_id, user_id=current_user.id).first()
-    attendee=Attendee.query.filter_by(event_id=event_id).all()
+    attendee=Attendee.query.filter_by(event_id=event_id)
+
+    query = request.args.get("q", "").strip()
+
+
+    # 🔍 Search logic
+    if query:
+        attendee = attendee.filter(
+            or_(
+                Attendee.name.ilike(f"%{query}%"),
+                Attendee.email.ilike(f"%{query}%")
+            )
+        )
+    attendee = attendee.all()
+
     private = PrivateAttendee.query.filter_by(event_id=event_id).all()
     attendee_count = Attendee.query.filter_by(event_id=event_id).count()
 
@@ -1458,12 +1477,14 @@ def manage_attendee(table,action,event_id,user_id):
                         return redirect(url_for("event_detail", event_id=event_id))
                     attend = Attendee(
                         event_id=event_id,
-                        user_id=user_id
+                        user_id=user_id,
+                        name= user.name,
+                        email = user.email
                     )
                     db.session.add(attend)
                     db.session.delete(private)
                     try:
-                        send_attendance_email(current_user.name, current_user.email, event.title, event.address,
+                        send_attendance_email(user.name, user.email, event.title, event.address,
                                               event.lga, event.state, event.event_date.strftime('%I:%M %p'))
                     except Exception as e:
                         flash(f"{str(e)}", "error")
