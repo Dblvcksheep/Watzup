@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Withdraw{% endblock %}
+{% block title %}Change Email{% endblock %}
 
 {% block content %}
 
@@ -7,9 +7,9 @@
 
   <!-- HEADER -->
   <div class="mb-4">
-    <h3 class="fw-bold mb-1">Verify Withdrawal</h3>
+    <h3 class="fw-bold mb-1">Change Email</h3>
     <p class="text-secondary mb-0">
-      Enter the verification code sent to your email.
+      Enter Your New Email Address.
     </p>
   </div>
 
@@ -21,20 +21,17 @@
       <!-- CODE INPUT -->
       <div class="mb-3">
         <label class="form-label text-secondary small">
-          Verification Code
+          New Email Address
         </label>
 
-        <input type="text"
-               name="code"
+        <input type="email"
+               name="email"
                class="form-control search-input"
-               placeholder="Enter 6-digit code"
-               maxlength="6"
-               inputmode="numeric"
-               style="letter-spacing: 4px;"
+               placeholder="Enter new email address"
                required>
 
         <small class="text-secondary d-block mt-2">
-          Check your email inbox or spam folder.
+          Confirm to change email.
         </small>
       </div>
 
@@ -44,11 +41,11 @@
         <button type="submit"
                 class="btn-primary-custom flex-fill">
 
-          Confirm Withdrawal
+          Confirm
 
         </button>
 
-        <a href="{{ url_for('index') }}"
+        <a href="{{ url_for('verify_user') }}"
            class="btn-light-custom flex-fill text-center">
 
           Cancel

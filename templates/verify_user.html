@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Withdraw{% endblock %}
+{% block title %}Verify User{% endblock %}
 
 {% block content %}
 
@@ -7,7 +7,7 @@
 
   <!-- HEADER -->
   <div class="mb-4">
-    <h3 class="fw-bold mb-1">Verify Withdrawal</h3>
+    <h3 class="fw-bold mb-1">Verify User</h3>
     <p class="text-secondary mb-0">
       Enter the verification code sent to your email.
     </p>
@@ -44,14 +44,21 @@
         <button type="submit"
                 class="btn-primary-custom flex-fill">
 
-          Confirm Withdrawal
+          Confirm
 
         </button>
 
-        <a href="{{ url_for('index') }}"
-           class="btn-light-custom flex-fill text-center">
+        <a href="{{ url_for('resend_code') }}"
+           class="flex-fill text-center">
 
-          Cancel
+          Resend Verification code
+
+        </a>
+
+        <a href="{{ url_for('change_email') }}"
+           class="flex-fill text-center">
+
+          Change Email
 
         </a>
 

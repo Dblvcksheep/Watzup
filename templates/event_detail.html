@@ -159,18 +159,38 @@
 
         </a>
 
-        {% if event.event_type != "paid" %}
+        {% if now < event.event_date %}
 
-        <a class="danger-link"
-        href="{{ url_for('manage_attendee',
-        table='attendee',
-        action=0,
-        event_id=event.id,
-        user_id=attendee.user.id) }}">
+          {% if event.event_type != "paid" %}
 
-          Remove
+            <a class="danger-link"
+            href="{{ url_for('manage_attendee',
+            table='attendee',
+            action=0,
+            event_id=event.id,
+            user_id=attendee.user.id) }}">
 
-        </a>
+              Remove
+
+            </a>
+
+          {% endif %}
+        {% else %}
+          {% if attendee.in_attendance %}
+
+            <span class="success-link">
+                Clocked In
+            </span>
+
+          {% else %}
+
+            <button class="mark-attendance-btn"
+            data-event-id="{{ event.id }}"
+            data-user-id="{{ attendee.user.id }}">
+                Mark Attendance
+            </button>
+
+          {% endif %}
 
         {% endif %}
 
@@ -435,6 +455,40 @@ function joinEvent(eventId){
 }
 
 </style>
+<script>
+document.querySelectorAll(".mark-attendance-btn").forEach(button => {
+    button.addEventListener("click", async function () {
+
+        const eventId = this.dataset.eventId;
+        const userId = this.dataset.userId;
+
+        try {
+            const response = await fetch(`/mark_attendant/${eventId}/${userId}`, {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.status === "success") {
+                alert(data.message);
+
+                // Optional UI update
+                this.innerText = "Clocked In";
+                this.disabled = true;
+            } else {
+                alert(data.message);
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("Something went wrong");
+        }
+    });
+});
+</script>
 
 {% endblock %}
 

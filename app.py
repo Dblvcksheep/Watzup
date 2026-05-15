@@ -70,6 +70,8 @@ class User(db.Model, UserMixin):
     lga = db.Column(db.String(100), nullable=False)
     password = db.Column(db.Text, nullable=False)
     wallet = db.Column(db.Float, nullable=False, default=0.0)
+    is_verified = db.Column(db.Boolean, default=False)
+    verify_code = db.Column(db.Integer(), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now())
     event = db.relationship('Event', backref='user', lazy='dynamic', cascade="all, delete-orphan")
     withdraws = db.relationship(
@@ -201,7 +203,7 @@ def login_key():
         return f"email:{email}"
     return f"ip:{get_remote_address()}"
 
-def send_welcome_email(name, user_email, user_password):
+def send_welcome_email(name, user_email,code):
     # Plain text fallback
     plain_body = f"""
 Welcome to Watzup
@@ -211,7 +213,7 @@ Hello {name},
 Your account has been created successfully.
 
 Email: {user_email}
-Password: {user_password}
+Verification code: {code}
 
 Login and start exploring events on Watzup.
 """
@@ -244,7 +246,7 @@ Login and start exploring events on Watzup.
           <p style="margin:0; font-size:13px; color:#aaa;">ACCOUNT DETAILS</p>
 
           <p style="margin:10px 0;"><strong>Email:</strong> {user_email}</p>
-          <p style="margin:10px 0;"><strong>Password:</strong> {user_password}</p>
+          <p style="margin:10px 0;"><strong>Verification Code:</strong> {code}</p>
 
         </div>
 
@@ -693,6 +695,24 @@ If this wasn't you, ignore this message.
 with open('nigeria.json', 'r') as f:
     states=json.load(f)
 
+
+@app.before_request
+def check_verification():
+
+    allowed_routes = [
+        'verify_user',
+        'logout',
+        'static'
+    ]
+
+    if (
+        current_user.is_authenticated
+        and not current_user.is_verified
+        and request.endpoint not in allowed_routes
+    ):
+        return redirect(url_for('verify_user'))
+    return None
+
 @app.route('/')
 def index():
     page = request.args.get('page', 1, type=int)
@@ -769,6 +789,63 @@ def index():
         now=now
     )
 
+@app.route('/verify_user', methods=["GET", "POST"])
+@login_required
+def verify_user():
+    if request.method == 'POST':
+        code = int(request.form.get('code'))
+        if code == current_user.verify_code:
+            current_user.is_verified = True
+            flash("Verified", 'success')
+            return redirect(url_for('index'))
+    return render_template('verify_user.html')
+
+@app.route('/resend_code')
+@login_required
+def resend_code():
+    code = random.randint(100000, 999999)
+    current_user.verify_code = code
+
+    db.session.commit()
+
+    try:
+        send_welcome_email(current_user.name, current_user.email, code)
+        flash('resent welcome message, check code in email', 'success')
+    except Exception as e:
+        flash(f"Error: {str(e)}", "error")
+    return redirect(url_for('verify_user'))
+
+@app.route('/change_email')
+@login_required
+def change_email():
+    if request.method == 'POST':
+        email = request.form.get('email').lower()
+        current_user.email = email
+        db.session.commit()
+        try:
+            send_welcome_email(current_user.name, email, current_user.code)
+            flash('email changed, check email for code', 'success')
+        except Exception as e:
+            flash(f"Error: {str(e)}", "error")
+        return redirect(url_for('verify_user'))
+    return render_template('change_email.html')
+
+@app.route('/mark_attendant/<int:event_id>/<int:user_id>')
+@login_required
+def mark_attendant(event_id, user_id):
+    event = Event.query.get(event_id)
+    if not (current_user.id == event.user_id):
+        return jsonify({"message": "Not authorised for this route", "status": "error"}), 404
+    attendee = Attendee.query.filter_by(event_id=event_id, user_id = user_id).first()
+    if attendee:
+        attendee.in_attendance = True
+
+        db.session.commit()
+    return jsonify({
+        "message": "Clocked in",
+        "status": "success"
+    })
+
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == 'POST':
@@ -786,16 +863,18 @@ def register():
         dateformat = datetime.strptime(date, '%Y-%m-%d')
         if not user:
             if password == confirm_pass:
-                reg = User(name=name, dob=dateformat, email=email, password=generate_password_hash(password, salt_length=5),state=state,lga=lga,gender=gender)
+                code = random.randint(100000, 999999)
+                reg = User(name=name, dob=dateformat, email=email, password=generate_password_hash(password, salt_length=5),state=state,lga=lga,gender=gender, verify_code=code)
                 db.session.add(reg)
                 db.session.commit()
                 login_user(reg)
                 try:
-                    send_welcome_email(name, email, password)
+                    send_welcome_email(name, email, code)
+                    flash('Code sent to your email', 'success')
                 except Exception as e:
                     flash(f"Error: {str(e)}", "error")
 
-                return redirect(url_for('index'))
+                return redirect(url_for('verify_user'))
             else:
                 flash('passwords do not match')
         else:
@@ -1385,6 +1464,7 @@ def event_detail(event_id):
             )
         )
     attendee = attendee.all()
+    now = datetime.now()
 
     private = PrivateAttendee.query.filter_by(event_id=event_id).all()
     attendee_count = Attendee.query.filter_by(event_id=event_id).count()
@@ -1395,7 +1475,8 @@ def event_detail(event_id):
                            already_set=already_set,
                            attendee=attendee,
                            private= private,
-                           attendee_count = attendee_count)
+                           attendee_count = attendee_count,
+                           now=now)
 
 @app.route("/nombank/webhook", methods=["POST"])
 def nombank_webhook():
